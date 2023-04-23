@@ -8,116 +8,22 @@
 # Install packages
 library(tidyverse)
 library(sf)
+library(data.table)
+library(animation)
 
+#### 1. Define Functions ####
 
-
-#### 1. Set up the Environment. ####
-
-# The environment is a 100x100 grid. Each grid cell has certain
-# properties, such as wind and current direction. Our first
-# model iteration will keep this VERY simple. But we will 
-# add stochasticity later.
-
-# Spatial extent of grid
-n_rows <- 1000
-n_cols <- 1000
-
-# We are interested in the behavioral ecology of this system,
-# as well as the large-scale strandings. We thus need to add
-# 'land' and 'water' attributes to our grid cells.
-
-cell_type <- matrix(c(rep('Land',n_rows*n_cols*(1/n_cols)), rep('Water',n_rows*n_cols)),
-                    nrow = n_rows, byrow = F) 
-
-# Assign wind and current speed and direction to each grid cell.
-# This is simple for now.
-
-# Let's srength as constants for now.
-current_strength <- matrix(rep(0.5,n_rows*n_cols), 
-                           nrow=n_rows)
-wind_strength <- matrix(rep(0.5,n_rows*n_cols), 
-                           nrow=n_rows)
-
-# Only to the left, or 'west'. So 1.5*pi gives us that direction in radians.
-wind_direction <- matrix(rep(1.5*pi, n_rows*n_cols), 
-                         nrow=n_rows, ncol=n_cols)
-# For current, we will set them to the 'south' (primitively emulating the EAC)
-current_direction <- matrix(rep(1*pi, n_rows*n_cols), 
-                            nrow=n_rows, ncol=n_cols)
-
-
-#### Step 2. Set up the Agents (Bluebottles and Dragons) and movement rules ####
-
-# We need to convert our lists to dataframes to make use of vectorization
-
-# Glaucus atlanticus individuals
-nGlaucus <- 2
-glaucus <- list()
-
-# Our individuals also have attributes. Glaucus are our predators.
-# They will seek out Physalia, and are capable of (very limited)
-# powered movement. Status 0 = alive, 1 = beached, 2 = died natural
-for (i in 1:nGlaucus) {
-  glaucus[[i]] <- list(
-    x = round(runif(1, 200, n_cols), digits = 0),
-    y = round(runif(1, 1, n_rows),digits = 0),
-    status = 0
-  )
-}
-
-# Set up bluebottle movement and functions
-
-nPhysalia <- 30
-physalia <- list()
-for (i in 1:nPhysalia) {
-  physalia[[i]] <- list(
-    x = runif(1, 1, n_cols),
-    y = runif(1, 1, n_rows),
-    orientation = sample(c('left', 'right'),1)
-  )
-}
-
-# Each entity needs movement rules, we set those up here. 
-# could maybe go into a function, 'glaucusmove'
-glaucusMovement <- function(glaucus){
-
-  if(glaucus$x > 200){
-    glaucus$col <- 'steelblue'
-    
-    # Positional update rules: this IS the movement of a Glaucus
-    glaucus$x <- max(glaucus$x + wind_strength[round(glaucus$x,digits = 2), 
-                                                         round(glaucus$y, digits = 2)] * sin(wind_direction[round(glaucus$x,digits = 2), 
-                                                                                                                 round(glaucus$y, digits = 2)]) +
-                            current_strength[round(glaucus$x,digits = 2), 
-                                             round(glaucus$y, digits = 2)] * sin(current_direction[round(glaucus$x,digits = 2), 
-                                                                                                        round(glaucus$y, digits = 2)]),0)
-    
-    # Y movement (north - south) uses cosine function
-    glaucus$y <- max(glaucus$y + wind_strength[round(glaucus$x,digits = 2), 
-                                                         round(glaucus$y, digits = 2)] * cos(wind_direction[round(glaucus$x,digits = 2), 
-                                                                                                                 round(glaucus$y, digits = 2)]) +
-                            current_strength[round(glaucus$x,digits = 2), 
-                                             round(glaucus$y, digits = 2)] * cos(current_direction[round(glaucus$x,digits = 2), 
-                                                                                                        round(glaucus$y, digits = 2)]),0)
-    
-  } else{
-    glaucus$col <- 'red'
-    glaucus$status <- 1 # status 1 is beached
-  }
-  return(glaucus)
-}
-
-# Physalia movement
-physaliaMovement <- function(physalia){
+# Movement of Physalia
+physaliaMovement <- function(physalia, glaucus){
   
-  # Boundary conditions
-  if(physalia$x >= 1000 | physalia$y >= 1000 | physalia$y <= 0){ 
+  # Boundary conditions for movement
+  if(physalia$x >= 100 | physalia$y >= 100 | physalia$y <= 0){ 
     physalia$col <- 'green' 
     physalia$status <- 2
     return(physalia)}
   
   # Live condition
-    if(physalia$x > 200){
+    if(physalia$x > 1 & physalia$status != 'EATEN'){
     physalia$col <- 'purple'
     
     # This is a very important part. We have right and left=handed bluebottles
@@ -133,92 +39,344 @@ physaliaMovement <- function(physalia){
     # Wind larger impact on physalia due to sail
     # physalia also have an offset - their sails change the way they interact
     # with wind - this is one of the cool parts in the model.
-    physalia$x <- max(physalia$x + 2*wind_strength[round(physalia$x,digits = 2), 
-                                                   round(physalia$y, digits = 2)] * sin(wind_direction[round(physalia$x,digits = 2), 
+    # 0.0266 - see Lee, Schaeffer, Groeskamp (2021)
+    physalia$x <- max(physalia$x + 0.0266*(wind_strength[round(physalia$x,digits = 2), 
+                                                   round(physalia$y, digits = 2)]) * sin(wind_direction[round(physalia$x,digits = 2), 
                                                                                                        round(physalia$y, digits = 2)]+ direction_offset) +
-                        current_strength[round(physalia$x,digits = 2), 
+                      current_strength[round(physalia$x,digits = 2), 
                                          round(physalia$y, digits = 2)] * sin(current_direction[round(physalia$x,digits = 2), 
                                                                                                 round(physalia$y, digits = 2)]),0)
     
     # Y movement (north - south) uses cosine function
-    physalia$y <- max(physalia$y + 2*wind_strength[round(physalia$x,digits = 2), 
-                                                   round(physalia$y, digits = 2)] * cos(wind_direction[round(physalia$x,digits = 2), 
+    physalia$y <- max(physalia$y + 0.0266*(wind_strength[round(physalia$x,digits = 2), 
+                                                   round(physalia$y, digits = 2)]) * cos(wind_direction[round(physalia$x,digits = 2), 
                                                                                                        round(physalia$y, digits = 2)] + direction_offset) +
-                        current_strength[round(physalia$x,digits = 2), 
+                       current_strength[round(physalia$x,digits = 2), 
                                          round(physalia$y, digits = 2)] * cos(current_direction[round(physalia$x,digits = 2), 
                                                                                                 round(physalia$y, digits = 2)]),0)
     
+    ### Predator module
+    
+    # We want to simulate damage to the physalia, i.e. being killed by a predator.
+    # We use a simple rule: if the glaucus is within feeding range of the physalai
+    # for 3 timesteps, the physalia has been eaten completely. The glaucus will then also
+    # move on as we delete the physalia. 
+    
+    # Convert to spatial geometries to allow geometric operations.
+    spat.point <- st_point(c(physalia$x, physalia$y))
+    
+    # We can decide what a reasonable buffer is. This is the same for
+    # all physalia. 50 cm seems reasonable
+    under.attack.zone <- st_buffer(spat.point, 0.0005)
+    
+    # Check if there is a predator nearby
+    glaucus.df <- rbindlist(glaucus, fill = T)
+    glaucus.df.spat <- st_as_sf(glaucus.df , coords = c('x', 'y'))
+    
+    # Any predators in the detection zone?
+    if(any(st_intersects(glaucus.df.spat, under.attack.zone, sparse = F))){
+      # If yes, the physalia is 'under attack'
+      physalia$underattack <- physalia$underattack + 1
+    }
+    
+    if(physalia$underattack >= 3){
+      physalia$status <- 'EATEN'
+    }
+    
   } else{
     physalia$col <- 'red'
-    physalia$status <- 1 # status 1 is beached
+    if(physalia$x < 1){
+      physalia$status <- 'BEACHED' # status 1 is beached
+    }
   }
   return(physalia)
 }
 
-plot(1:1000, 1:1000, type = 'n',
+# Movement of Glaucus
+glaucusMovement <- function(glaucus, physalia){
+  
+  # Check the glaucus is not beached
+  if(glaucus$x > 1){
+    glaucus$col <- 'steelblue'
+    
+    
+    ### Predator module
+    
+    # Glaucus are predators. They can detect prey from distance using chemical cues. We want to simulate these capabilities
+    # by allowing glaucus limited movement to a target, if the target is within reasonable range.
+    
+    # scan area for each glaucus
+    # Convert to spatial geometries to allow geometric operations.
+    spat.point <- st_point(c(glaucus$x, glaucus$y))
+    
+    # We can decide what a reasonable buffer is. This might be a parameter tied to the 
+    # individual Glaucus!
+    detection.zone <- st_buffer(spat.point, glaucus$chemodetection)
+
+    # Find the Physalia that are within the detection zone.
+    # needs to be in df format!!!1 vectorise all at once.
+    
+    physalia.df <- rbindlist(physalia, fill = T)
+    
+    physalia.df.spat <- st_as_sf(physalia.df , coords = c('x', 'y'))
+    
+    # Any prey in the detection zone?
+    if(any(st_intersects(physalia.df.spat, detection.zone, sparse = F))){
+      # Find the nearest Physalia
+      print('Attack!')
+      glaucus.target <- physalia.df.spat[[st_nearest_feature(spat.point, physalia.df.spat),'geometry']]
+      # Now make it move towards the target. We want to use a random walk-esque
+      # movement with bias towards the physalia.
+      
+      target_angle <- atan2(glaucus.target[2] - glaucus$y, glaucus.target[1] - glaucus$x) # atan2 calculates the angle to get from y to x
+      glaucus$x <- glaucus$x + glaucus$speed * cos(target_angle)
+      glaucus$y <- glaucus$y +  glaucus$speed * sin(target_angle)
+      
+    }
+
+  
+    # Now account for effect of current and wind on glaucus.  
+    
+    # Positional update rules: this IS the movement of a Glaucus
+    glaucus$x <- max(glaucus$x + 0.005*wind_strength[round(glaucus$x,digits = 2), 
+                                               round(glaucus$y, digits = 2)] * sin(wind_direction[round(glaucus$x,digits = 2), 
+                                                                                                  round(glaucus$y, digits = 2)]) +
+                       current_strength[round(glaucus$x,digits = 2), 
+                                        round(glaucus$y, digits = 2)] * sin(current_direction[round(glaucus$x,digits = 2), 
+                                                                                              round(glaucus$y, digits = 2)]),0)
+    
+    # Y movement (north - south) uses cosine function
+    glaucus$y <- max(glaucus$y + 0.005*wind_strength[round(glaucus$x,digits = 2), 
+                                               round(glaucus$y, digits = 2)] * cos(wind_direction[round(glaucus$x,digits = 2), 
+                                                                                                  round(glaucus$y, digits = 2)]) +
+                       current_strength[round(glaucus$x,digits = 2), 
+                                        round(glaucus$y, digits = 2)] * cos(current_direction[round(glaucus$x,digits = 2), 
+                                                                                              round(glaucus$y, digits = 2)]),0)
+    
+  } else{
+    glaucus$col <- 'red'
+    glaucus$status <- 'BEACHED' # status 1 is beached
+  }
+  return(glaucus)
+}
+
+# Main function that runs the simulation
+simBlueFleet <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
+                         strength_current, strength_wind,
+                         dir_wind, dir_current,
+                         glaucus_Chemodetection, glaucus_Speed, iniSpace){
+  
+  # Assign wind and current speed and direction to each grid cell.
+  # Based on param input
+  current_strength <- matrix(rep(strength_current,n_rows*n_cols), 
+                              nrow=n_rows)
+  wind_strength <- matrix(rep(strength_wind,n_rows*n_cols), 
+                           nrow=n_rows)
+  
+  # Wind and current directions
+  
+  wind_direction <- matrix(rep(dir_wind, n_rows*n_cols), 
+                            nrow=n_rows, ncol=n_cols)
+  current_direction <- matrix(rep(dir_current, n_rows*n_cols), 
+                               nrow=n_rows, ncol=n_cols)
+  
+  
+  ### Instantiate model agents
+  
+  # Glaucus atlanticus individuals
+  print('Generating animals')
+  # Our individuals also have attributes. Glaucus are our predators.
+  # They will seek out Physalia, and are capable of (very limited)
+  # powered movement. 
+  
+  glaucus <- list()
+  for (i in 1:nGlaucus) {
+    glaucus[[i]] <- list(
+      x = round(runif(1, iniSpace$xmin, iniSpace$xmax), digits = 0),
+      y = round(runif(1,iniSpace$ymin, iniSpace$ymax),digits = 0),
+      chemodetection = glaucus_Chemodetection, 
+      speed = rnorm(1,glaucus_Speed, sd=0.05),
+      status = 'ALIVE'
+    )
+  }
+  
+  # Set up bluebottle movement and functions. Bluebottles can be right
+  # or left handed.
+  physalia <- list()
+  for (i in 1:nPhysalia) {
+    physalia[[i]] <- list(
+      x = round(runif(1, iniSpace$xmin, iniSpace$xmax), digits = 0),
+      y = round(runif(1, iniSpace$ymin, iniSpace$ymax),digits = 0),
+      underattack = 0,
+      status = 'ALIVE',
+      orientation = sample(c('left', 'right'),1)
+    )
+  }
+  
+  print('Simulating Dynamics')
+  GlaucusSim <- list()
+  PhysaliaSim <- list()
+
+  # Run model over nTimes steps.
+  for (i in 1:nTimes){
+
+    # Update Physalia movement
+    for(k in 1:nPhysalia){
+      
+      # This function updates the position of all simulated
+      # Physalia. Also tracks their 'status', which may be one
+      # of 'ALIVE', 'BEACHED', or 'EATEN'.
+      physalia[[k]] <- physaliaMovement(physalia[[k]], glaucus)
+    }
+
+    PhysaliaSim[[i]] <- rbindlist(physalia)
+    
+    
+    # Update Glaucus movement. Status includes 'BEACHED' or 'ALIVE'.
+    for(j in 1:nGlaucus){
+      glaucus[[j]] <- glaucusMovement(glaucus[[j]], physalia)
+      
+    }
+    GlaucusSim[[i]] <- rbindlist(glaucus)
+  }
+  simResults <- list('GlaucusStats' = GlaucusSim,
+                     'PhysaliaSim' = PhysaliaSim)
+  return(simResults)
+}
+
+# Custom function for drawing a glaucus
+draw.Glaucus <- function(center, scaling = 1){
+  coords_body = as.matrix(data.frame('x'=(c(5,7,8.2,8.5,7,6,8,10,10,10,8,6,6,5,4,4,2,0,0,0,2,4,3,1.5,1.8,3,5) * scaling) + center[1],
+                                     "y"=(c(2, 8,7,8,8,9,10.5,10,11,12,11,12,13.5,14,13.5,12,11,12,11,10,10.5,9,8,8,7,8,2)*10 * scaling) + center[2]))
+  coords_stripe = as.matrix(data.frame('x'=(c(5,4.5,4.5,4.2,5.8,5.5,5.5,5)*scaling) + center[1],
+                                       "y"=(c(4.5,8,12.5,13,13,12.5,8,4.5)*10*scaling)+ center[2]))
+  Glaucus_Body <- st_polygon(list(coords_body))
+  Glaucus_Stripe <- st_polygon(list(coords_stripe))
+  plot(Glaucus_Body, col = 'skyblue', add =T)
+  plot(Glaucus_Stripe, col = 'blue', add = T)
+}
+
+
+#### 2. Run Simulations ####
+
+# Initialise the starting area for the fleet. I
+# did not think it made sense to just have them randomly
+# throughout the ocean, they should be relatively close
+# together to start. We can then see how they diverge.
+
+iniSpace <- list(xmin = 8,
+                 xmax = 10,
+                 ymin = 90,
+                 ymax = 100)
+
+# Grid spatial extent, each unit represents a kilometer
+n_rows <- 100
+n_cols <- 100
+
+# Number of simulation iterations
+nTimes = 1000
+
+# Number of Glaucus and Pysalia individuals
+nPhysalia = 1000
+nGlaucus = 25
+
+# Wind and current speeds (in km/H).
+# Param recommended options:
+strength_current = 1.5
+strength_wind = 5
+
+# Wind and current directions
+# We use radians to denote directions. Feasible parameter values are therefore:
+# any number between 1 and 2, where:
+# 'west' = 1.5 pi
+# 'east' = .5*pi
+# 'north' = 0
+# 'south' = pi
+
+dir_wind = 1.5*pi
+dir_current = pi
+
+# Dragon Chemodetection. The detection range for a predator.
+# These are REALLY small animals, and they are limited in 
+# movement. It really is an unknown.
+# Parameter in meters. Sensible would be anything up to 1m (km units)
+glaucus_Chemodetection <- 0.001
+
+# Dragon speed. How fast can they swim? Again, not much is known
+# Reasonable parameter values range between 1-25 cm an hour.
+# We add some stochasticity to this in the model.
+glaucus_Speed <- 0.00015
+
+# Run the simulation
+BFS<-simBlueFleet(nTimes=nTimes, n_rows = n_rows, n_cols = n_cols, nPhysalia = nPhysalia, nGlaucus = nGlaucus,
+                   strength_current = strength_current, strength_wind = strength_wind,
+                   dir_wind = dir_wind, dir_current = dir_current, glaucus_Chemodetection = glaucus_Chemodetection,
+                   glaucus_Speed = glaucus_Speed, iniSpace = iniSpace)
+
+
+
+#### Model Analyses ####
+
+# What output files do we need?
+# - Number of beaching, per animal
+# 
+
+
+
+
+
+
+
+
+# Movie
+n_frames <- 100
+interval = 0.1
+fps <- 5
+
+saveGIF({
+
+  for(i in 1:100){
+    plot(1:100 ,1:100, type = 'n',
+         xlab = '<- West - East ->',
+         ylab = '<- North - South ->', xlim=c(0,10))
+    abline(v=1, lty=2, col='red')
+    for(k in 1:nPhysalia){
+      physalia[[k]] <- physaliaMovement(physalia[[k]], glaucus)
+      points(x=physalia[[k]]$x,
+             y=physalia[[k]]$y,
+             col = ifelse(physalia[[k]]$orientation == 'left', 'purple', 'yellow'),
+             pch = 19,
+             cex = 0.5)
+    }
+    for(j in 1:nGlaucus){
+      glaucus[[j]] <- glaucusMovement(glaucus[[j]], physalia)
+      draw.Glaucus(c(glaucus[[j]]$x, glaucus[[j]]$y), scaling = .05)
+    }
+  }
+}, movie.name = "Hunting.gif",interval = interval, ani.width = 1000, ani.height = 1000, fps = fps)
+
+
+plot(1:100 ,1:100, type = 'n',
      xlab = '<- West - East ->',
-     ylab = '<- North - South ->')
-abline(v=200, lty=2, col='red')
-for(i in 1:1000){
-  for(j in 1:nGlaucus){
-    glaucus[[j]] <- glaucusMovement(glaucus[[j]])
-    points(x=glaucus[[j]]$x,
-           y=glaucus[[j]]$y,
-           col = glaucus[[j]]$col,
-           pch = 19,
-           cex = 0.1)
-  }
-  for(k in 1:nPhysalia){
-    physalia[[k]] <- physaliaMovement(physalia[[k]])
-    points(x=physalia[[k]]$x,
-           y=physalia[[k]]$y,
-           col = physalia[[k]]$col,
-           pch = 19,
-           cex = 0.1)
-  }
+     ylab = '<- North - South ->', xlim=c(0,10))
+abline(v=1, lty=2, col='red')
+
+for(k in 1:length(BFS$PhysaliaSim)){
+  points(x=BFS$PhysaliaSim[[k]]$x,
+         y=BFS$PhysaliaSim[[k]]$y,
+         col = ifelse(BFS$PhysaliaSim[[k]]$orientation == 'left', 'purple', 'yellow'),
+         pch = 19,
+         cex = 0.1)
+}
+for(j in 1:length(BFS$GlaucusStats)){
+  points(x=BFS$GlaucusStats[[j]]$x,
+         y=BFS$GlaucusStats[[j]]$y,
+         col = 'blue',
+         pch = 19,
+         cex = 0.1)
+  #draw.Glaucus(c(BFS$GlaucusStats[[j]]$x, BFS$GlaucusStats[[j]]$y), scaling = .05)
   
 }
 
-#### Step 3. Set up interactions between Glaucus and Physalia ####
 
-# scan area for each glaucus
-# Convert to spatial geometries to allow geometric operations.
-spat.point <- st_point(c(glaucus$x, glaucus$y))
-
-# We can decide what a reasonable buffer is. This might be a parameter tied to the 
-# individual Glaucus!
-detection.zone <- st_buffer(spat.point, 500)
-
-# Find the Physalia that are within the detection zone.
-# needs to be in df format!!!1 vectorise all at once.
-for (individual in physalia){
-  spat.point.physalia <- st_point(c(individual$x, individual$y))
-  if(st_intersects(spat.point.physalia, detection.zone, sparse = F)){
-    # might need to add the CLOSEST here.
-    glaucus.target <- as.data.frame(st_coordinates(spat.point.physalia))
-  }
-  else{
-    next
-  }
-}
-
-# Now make it move towards the target. We want to use a random walk
-# like movement with bias towards the physalia.
-target_angle <- atan2(glaucus.target$Y - glaucus$y, glaucus.target$X - glaucus$x)
-
-
-plot(spat.point, add=T, col ='blue', pch =19)
-plot(spat.point.physalia,add=T, col ='purple', pch =19)
-plot(detection.zone, add =T)
-
-for(i in 1:1000){
-  target_angle <- atan2(glaucus.target$Y - glaucus$y, glaucus.target$X - glaucus$x)
-  glaucus$x <- glaucus$x+ rnorm(1, 1, 0.5) * cos(target_angle)
-  glaucus$y <- glaucus$y +  rnorm(1, 1, 0.5) * sin(target_angle)
-  points(x=glaucus$x,
-         y=glaucus$y,
-         col='blue',
-         pch=19,
-         cex =0.3)
-}
 
