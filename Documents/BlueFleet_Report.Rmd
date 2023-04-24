@@ -5,14 +5,37 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
+![](./Images/BlueFleet_Image_ABC.jpeg)
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, incl = T)
+
 ```
 
 ## Introduction
 
-```{r cars}
-summary(cars)
+```{r cars, eval =T}
+
 ```
 
 ## Movement Equations
+
+### Glaucus atlanticus
+
+
+$$
+
+X_{i+1} = X_i
+
+$$
+
+
+```{r GA Movement}
+summary(cars)
+```
+<br>
+
+### Physalia physalis
+```{r PP Movement}
+summary(cars)
+```
