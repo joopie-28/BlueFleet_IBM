@@ -32,8 +32,8 @@ physaliaMovement <- function(physalia, glaucus){
     # stochasticity to the movement. This is due to inherent variability
     # in the shape and size of bluebottles, but also due to waves etc.
     
-    if(physalia$orientation == 'right') {direction_offset <- rnorm(1,1,0.5)*pi/3} # right-handed drift at 50 degrees from wind direction.
-    if(physalia$orientation == 'left') {direction_offset <- rnorm(1,-1,0.5)*pi/3} # left handed drift at
+    if(physalia$orientation == 'right') {direction_offset <- rnorm(1,1,0.1)*pi/3} # right-handed drift at 50 degrees from wind direction.
+    if(physalia$orientation == 'left') {direction_offset <- rnorm(1,-1,0.1)*pi/3} # left handed drift at
 
     # Positional update rules: this IS the movement of physalia
     # Wind larger impact on physalia due to sail
@@ -129,8 +129,8 @@ glaucusMovement <- function(glaucus, physalia){
       # movement with bias towards the physalia.
       
       target_angle <- atan2(glaucus.target[2] - glaucus$y, glaucus.target[1] - glaucus$x) # atan2 calculates the angle to get from y to x
-      glaucus$x <- glaucus$x + glaucus$speed * cos(target_angle)
-      glaucus$y <- glaucus$y +  glaucus$speed * sin(target_angle)
+      glaucus$x <- glaucus$x + glaucus$speed * sin(target_angle)
+      glaucus$y <- glaucus$y +  glaucus$speed * cos(target_angle)
       
     }
 
