@@ -269,9 +269,9 @@ iniSpace <- list(xmin = 8,
                  ymin = 90,
                  ymax = 100)
 
-# Grid spatial extent, each unit represents a kilometer
-n_rows <- 100
+# Grid spatial extent, each unit represents a meter
 n_cols <- 100
+n_rows <- 100
 
 # Number of simulation iterations
 nTimes = 1000

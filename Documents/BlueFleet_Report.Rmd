@@ -1,8 +1,10 @@
 ---
-title: "Predator, prey and strandings: An IBM approach to modelling the 'Blue Fleet'"
+title: 'Predator, prey and strandings: An IBM approach to modelling the ''Blue Fleet'''
 author: "J.M. Sassen"
 date: "`r Sys.Date()`"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ![](./Images/BlueFleet_Image_ABC.jpeg)
@@ -12,17 +14,30 @@ knitr::opts_chunk$set(echo = TRUE, incl = T)
 
 ```
 
-## Introduction
+# 1. Introduction
 
-```{r cars, eval =T}
+I have two simple questions:
+- Do different animals of the blue fleet have differential probabilities of wind and current driven beaching?
+- Do ecological interactions impact the propbability of beaching?
 
-```
+# 2. Model Elaboration
 
-## Movement Equations
+## 2.1 Conceptual Overview
+<p align="justify">
+The model is designed to investigate the effects of physical factors such as wind and ocean currents on the movement and behavior of the two species. We created a 50km x 10km grid, with a spatial resolution of 1 meter (5*10^9 total cells). Cells with x-values > 1km were assigned a 'land' status and all other cells where assigned an 'ocean' status. This resulted in a straight coastline stretching the left side of the grid, emulating the Eastern Australian Coastline. Each individual cell was then assigned a value for the following physical parameters: Wind Speed, Wind Direction, Current Speed, Current Direction. The temporal resolution was 1 hour. Thus, all speed parameters are in km/H, and each iteration represents 1 hour in real-time.
 
-The main purpose of this model is to simulate the drifting patterns of two members of the Blue Fleet. The distribution of these animals is mainly driven by winds and currents. 
+The environment was then populated with individual Glaucus and Physalia, each with their own unique attributes. For glaucus, we assigned the following attributes: initial X coordinate, initial Y coordinate, chemodetection range, and movement speed. As both chemodetection and speed are traits that are expected to vary between Glaucus, these were assigned by drawing one value from a normal distribution with mean = LITERATURE and sd = LITERATURE. Individual Glaucus could end up beached or alive at the end of the simulation. For Physalia, the following attributes were assigned: initial X coordinate, initial Y coordinate and orientation. Orientation refers to the position of the sail relative to the tentacles: this comes in a 'right-handed' or 'left-handed' variation. This variable was assigned randomly for each individual. Individual physalia could end up beached, eaten, or alive at the end of the simulation.
 
-### Glaucus atlanticus
+Whilst grid resolution was 1m, our model allows individuals to move through continuous space. The movement of an individual depends on the winds and current within the current cell, however the effect of these drivers might only amount to a movement of 20 cm within a timestep. This value is used to update the position of the individual. On the next iteration, the individual will simply 'feel' the same physical drivers, as it still finds itself in the same cell. This enables us to include the biological interactions that occur on the scale of centimeters. 
+
+
+</p>
+
+## 2.2 Movement Equations
+
+\n
+
+### 2.2.1 Glaucus atlanticus
 $$
 X_{ij+1} = X_{ij} + WindSpeed_{{xy,i}} * sin(WindDirection_{xy,i}) + CurrentSpeed_{xy,i} * sin(CurrentDirection_{xy,i}) + C * (GlaucusSpeed_{ij} * sin(atan(Y_{Prey} - Y_i, X_{Prey} - X_i)))
 $$
@@ -49,7 +64,19 @@ C = \begin{cases}
 \end{cases}
 $$
 
+<p align="justify">
+The movement of Glaucus atlanticus depends on physical and biological parameters. For iteration i of the model, the position of an individual is given by the x and y coordinate. The displacement between time = i and time = i + 1 is given by above equations. The effects of winds and current depend on i) the speed in km/h and ii) the direction in radians. Sin(direction) then gives vertical (north-south) displacement, whilst cos(direction) gives horizontal (east-west). To illustrate, if wind is blowing from the east, direction equals 1.5 * pi. Displacement can then be calculated as:
+</p>
 
+$$
+\Delta_{x} = sin(1.5 * pi) * speed = -1*speed \\
+\Delta_{y} = cos(1.5*pi) = 0 \\
+\text{Thus, wind from the east will move an individual to the west}
+$$
+
+<p align="justify">
+In addition, we allow Glaucus to make small directed movements towards prey, if their prey is within a certain 'detection zone'. The size of this detection zone depends on the chemodetection abilities of an individual glaucus. If a prey item is within the zone, we calculate the angle in radians between the predator and the prey, and multiply this new direction by the speed of that particular glaucus. The glaucus will always move to the closest prey item it detects.
+</p>
 
 ```{r GA Movement, eval = F, incl = T}
 # Movement of Glaucus
@@ -122,10 +149,10 @@ glaucusMovement <- function(glaucus, physalia){
 ```
 <br>
 
-### Physalia physalis
+### 2.2.2 Physalia physalis
 $$
-X_{ij+1} = X_{ij} + 0.0266*(WindSpeed_{{xy,i}} * sin(WindDirection_{xy,i})) + CurrentSpeed_{xy,i} * sin(CurrentDirection_{xy,i} + D_{ij})) \\
-Y_{ij+1} = Y_{ij} + 0.0266*(WindSpeed_{{xy,i}} * cos(WindDirection_{xy,i})) + CurrentSpeed_{xy,i} * cos(CurrentDirection_{xy,i} + D_{ij})
+X_{ij+1} = X_{ij} + 0.0266*(WindSpeed_{{xy,i}} * sin(WindDirection_{xy,i}+ D_{ij})) + CurrentSpeed_{xy,i} * sin(CurrentDirection_{xy,i}) \\
+Y_{ij+1} = Y_{ij} + 0.0266*(WindSpeed_{{xy,i}} * cos(WindDirection_{xy,i}+ D_{ij})) + CurrentSpeed_{xy,i} * cos(CurrentDirection_{xy,i})
 $$
 ***Where:*** 
 $$
@@ -138,14 +165,13 @@ WindDirection_{xy,i} = \text{Wind Direction}\,\text{in}\, cell_{X_i,Y_i},\text{a
 CurrentSpeed_{xy,i} = \text{Current Speed}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
 CurrentDirection_{xy,i} = \text{Current Direction}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
 D_{ij} = \begin{cases}
-normal(pi/3, 0.1), & \text{if Orientation}_j = Right \\
-normal(-pi/3,0.1), & \text{if Orientation}_j = Left
+normal(pi/3, 0.1) & \text{if Orientation}_j = Right \\
+normal(-pi/3,0.1) & \text{if Orientation}_j = Left
 \end{cases} \text{at Time = } i \\
 Orientation_j = \text{Sail Orientation of Individual}_j \text{ at Time = } i
 $$
 
-
-
+Physalia moves at ~2.66% the speed of the wind (REF). Left-sailed individuals will be pushed in a direction 50 degrees to the left of the prevailing wind, whilst right handed individuals move 50 degrees to the right of prevailing winds. The effect of currents on physalia is described using the same equations as for Glaucus.
 ```{r PP Movement, eval=F, include=TRUE}
 # Movement of Physalia
 physaliaMovement <- function(physalia, glaucus){
@@ -227,3 +253,111 @@ physaliaMovement <- function(physalia, glaucus){
 }
 
 ```
+
+
+### 2.3 Biological Interactions
+<p align="justify">
+Both Physalia and Glaucus are allowed to interact with each other in our model, and this affects their movements. Glaucus will seek out nearby physalia as described in section 2.2.1. However, they may also 'latch' on to a physalia. This emulates feeding behaviour in which Glaucus move within the tentacles of a physalia: Glaucus may then move with the physalia, until it stops feeding or completely depletes the resource. Consequently, the time it takes to deplete the resource equals the time it takes for a Physalia to be killed. We assume that an individual physalia cannot survive unlimited attacks by Glaucus, and thus an individual that spends more than REF X hours 'under attack' will be assigned the status 'EATEN' and no further movements are simulated. Any Glaucus that was 'latched on' to the deceased prey, or one that simply stops feeding, then reverts to their regular movement equations. 
+</p>
+
+# 3. Model Simulation and Parameter Screening
+
+## 3.1 Simulation Function
+```{r FullSim, eval=F, include=TRUE}
+# Main function that runs the simulation
+simBlueFleet <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
+                         strength_current, strength_wind,
+                         dir_wind, dir_current,
+                         glaucus_Chemodetection, glaucus_Speed, iniSpace){
+  
+  # Assign wind and current speed and direction to each grid cell.
+  # Based on param input
+  current_strength <- matrix(rep(strength_current,n_rows*n_cols), 
+                              nrow=n_rows)
+  wind_strength <- matrix(rep(strength_wind,n_rows*n_cols), 
+                           nrow=n_rows)
+  
+  # Wind and current directions
+  
+  wind_direction <- matrix(rep(dir_wind, n_rows*n_cols), 
+                            nrow=n_rows, ncol=n_cols)
+  current_direction <- matrix(rep(dir_current, n_rows*n_cols), 
+                               nrow=n_rows, ncol=n_cols)
+  
+  
+  ### Instantiate model agents
+  
+  # Glaucus atlanticus individuals
+  print('Generating animals')
+  # Our individuals also have attributes. Glaucus are our predators.
+  # They will seek out Physalia, and are capable of (very limited)
+  # powered movement. 
+  
+  glaucus <- list()
+  for (i in 1:nGlaucus) {
+    glaucus[[i]] <- list(
+      x = round(runif(1, iniSpace$xmin, iniSpace$xmax), digits = 0),
+      y = round(runif(1,iniSpace$ymin, iniSpace$ymax),digits = 0),
+      chemodetection = glaucus_Chemodetection, 
+      speed = rnorm(1,glaucus_Speed, sd = glaucus_Speed/4),
+      status = 'ALIVE'
+    )
+  }
+  
+  # Set up bluebottle movement and functions. Bluebottles can be right
+  # or left handed.
+  physalia <- list()
+  for (i in 1:nPhysalia) {
+    physalia[[i]] <- list(
+      x = round(runif(1, iniSpace$xmin, iniSpace$xmax), digits = 0),
+      y = round(runif(1, iniSpace$ymin, iniSpace$ymax),digits = 0),
+      underattack = 0,
+      status = 'ALIVE',
+      orientation = sample(c('left', 'right'),1)
+    )
+  }
+  
+  print('Simulating Dynamics')
+  GlaucusSim <- list()
+  PhysaliaSim <- list()
+
+  # Run model over nTimes steps.
+  for (i in 1:nTimes){
+
+    # Update Physalia movement
+    for(k in 1:nPhysalia){
+      
+      # This function updates the position of all simulated
+      # Physalia. Also tracks their 'status', which may be one
+      # of 'ALIVE', 'BEACHED', or 'EATEN'.
+      physalia[[k]] <- physaliaMovement(physalia[[k]], glaucus)
+    }
+
+    PhysaliaSim[[i]] <- rbindlist(physalia)
+    
+    
+    # Update Glaucus movement. Status includes 'BEACHED' or 'ALIVE'.
+    for(j in 1:nGlaucus){
+      glaucus[[j]] <- glaucusMovement(glaucus[[j]], physalia)
+      
+    }
+    GlaucusSim[[i]] <- rbindlist(glaucus)
+  }
+  simResults <- list('GlaucusStats' = GlaucusSim,
+                     'PhysaliaSim' = PhysaliaSim)
+  return(simResults)
+}
+
+```
+## 3.2 Bash Script for Parameter Screening
+```{bash ParScreen, eval=F, include=TRUE}
+touch
+
+```
+# 4. Results
+
+# 5. Conclusion
+
+# 6. References
+
+
