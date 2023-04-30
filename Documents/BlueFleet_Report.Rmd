@@ -18,7 +18,11 @@ knitr::opts_chunk$set(echo = TRUE, incl = T)
 
 I have two simple questions:
 - Do different animals of the blue fleet have differential probabilities of wind and current driven beaching?
-- Do ecological interactions impact the propbability of beaching?
+
+- Investigate this by comparing beaching metrics for different groups for varying wind and current speeds.
+- we also perform one model screen where wind direction changes over time.
+
+- Do ecological interactions impact the probability of beaching? 
 
 # 2. Model Elaboration
 
