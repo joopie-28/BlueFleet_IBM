@@ -2,9 +2,6 @@
 library(tidyverse)
 library(sf)
 library(data.table)
-library(animation)
-
-
 
 # Movement of Physalia
 physaliaMovement <- function(physalia, glaucus){

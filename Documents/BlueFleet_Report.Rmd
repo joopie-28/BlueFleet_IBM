@@ -58,6 +58,7 @@ CurrentDirection_{xy,i} = \text{Current Direction}\,\text{in}\, cell_{X_i,Y_i},\
 GlaucusSpeed_{i,j} = \text{Swimming Speed}\,\text{for}\, Individual_{j }\text{ at}\,\text{Time = }\,i \\
 Y_{prey} = \text{Y coordinate of closest prey for}\, Individual_{j } \text{ at Time = } i \\
 X_{prey} = \text{X coordinate of closest prey for}\, Individual_{j } \text{ at Time = } i \\
+Prey = ∀Physalia \\
 C = \begin{cases}
 1, & \text{if Prey within } Detection Range_j \\
 0, & \text{if Prey beyond } Detection Range_j
