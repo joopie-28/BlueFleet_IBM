@@ -1,0 +1,548 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Predator, prey and strandings: An IBM approach to modelling the `Blue Fleet'},
+  pdfauthor={J.M. Sassen},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Predator, prey and strandings: An IBM approach to modelling the
+`Blue Fleet'}
+\author{J.M. Sassen}
+\date{2023-05-01}
+
+\begin{document}
+\maketitle
+
+\includegraphics{./Images/BlueFleet_Image_ABC.jpeg}
+
+\hypertarget{introduction}{%
+\section{1. Introduction}\label{introduction}}
+
+I have two simple questions: - Do different animals of the blue fleet
+have differential probabilities of wind and current driven beaching?
+
+\begin{itemize}
+\item
+  Investigate this by comparing beaching metrics for different groups
+  for varying wind and current speeds.
+\item
+  we also perform one model screen where wind direction changes over
+  time.
+\item
+  Do ecological interactions impact the probability of beaching?
+\end{itemize}
+
+\hypertarget{model-elaboration}{%
+\section{2. Model Elaboration}\label{model-elaboration}}
+
+\hypertarget{conceptual-overview}{%
+\subsection{2.1 Conceptual Overview}\label{conceptual-overview}}
+
+The model is designed to investigate the effects of physical factors
+such as wind and ocean currents on the movement and behavior of the two
+species. We created a 50km x 10km grid, with a spatial resolution of 1
+meter (5*10\^{}9 total cells). Cells with x-values \textgreater{} 1km
+were assigned a `land' status and all other cells where assigned an
+`ocean' status. This resulted in a straight coastline stretching the
+left side of the grid, emulating the Eastern Australian Coastline. Each
+individual cell was then assigned a value for the following physical
+parameters: Wind Speed, Wind Direction, Current Speed, Current
+Direction. The temporal resolution was 1 hour. Thus, all speed
+parameters are in km/H, and each iteration represents 1 hour in
+real-time.
+
+The environment was then populated with individual Glaucus and Physalia,
+each with their own unique attributes. For glaucus, we assigned the
+following attributes: initial X coordinate, initial Y coordinate,
+chemodetection range, and movement speed. As both chemodetection and
+speed are traits that are expected to vary between Glaucus, these were
+assigned by drawing one value from a normal distribution with mean =
+LITERATURE and sd = LITERATURE. Individual Glaucus could end up beached
+or alive at the end of the simulation. For Physalia, the following
+attributes were assigned: initial X coordinate, initial Y coordinate and
+orientation. Orientation refers to the position of the sail relative to
+the tentacles: this comes in a `right-handed' or `left-handed'
+variation. This variable was assigned randomly for each individual.
+Individual physalia could end up beached, eaten, or alive at the end of
+the simulation.
+
+Whilst grid resolution was 1m, our model allows individuals to move
+through continuous space. The movement of an individual depends on the
+winds and current within the current cell, however the effect of these
+drivers might only amount to a movement of 20 cm within a timestep. This
+value is used to update the position of the individual. On the next
+iteration, the individual will simply `feel' the same physical drivers,
+as it still finds itself in the same cell. This enables us to include
+the biological interactions that occur on the scale of centimeters.
+
+\hypertarget{movement-equations}{%
+\subsection{2.2 Movement Equations}\label{movement-equations}}
+
+\n
+
+\hypertarget{glaucus-atlanticus}{%
+\subsubsection{2.2.1 Glaucus atlanticus}\label{glaucus-atlanticus}}
+
+\[
+X_{ij+1} = X_{ij} + WindSpeed_{{xy,i}} * sin(WindDirection_{xy,i}) + CurrentSpeed_{xy,i} * sin(CurrentDirection_{xy,i}) + C * (GlaucusSpeed_{ij} * sin(atan(Y_{Prey} - Y_i, X_{Prey} - X_i)))
+\] \[
+Y_{ij+1} = Y_{ij} + WindSpeed_{{xy,i}} * cos(WindDirection_{xy,i}) + CurrentSpeed_{xy,i} * cos(CurrentDirection_{xy,i}) + C * (GlaucusSpeed_{ij} * cos(atan(Y_{Prey} - Y_{ij}, X_{Prey} - X_{ij} )) )
+\] \textbf{\emph{Where:}}
+
+\[
+X_{ij+1} = \text{Position}\,\text{along}\,\text{the}\,\text{East-West}\,\text{Axis for}\,Individual_{j }\text{ at}\,\text{Time = }\,i+1 \\
+X_{ij} = \text{Position}\,\text{along}\,\text{the}\,\text{East-West}\,\text{Axis for}\,Individual_{j }\text{ at}\,\text{Time = }\,i \\
+Y_{ij+1} = \text{Position}\,\text{along}\,\text{the}\,\text{North-South}\,\text{Axis for}\,Individual_{j }\text{ at}\,\text{Time = }\,i+1 \\
+Y_{ij} = \text{Position}\,\text{along}\,\text{the}\,\text{North-South}\,\text{Axis for}\,Individual_{j }\text{ at}\,\text{Time = }\,i \\
+WindSpeed_{xy,i} = \text{Wind Speed}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
+WindDirection_{xy,i} = \text{Wind Direction}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
+CurrentSpeed_{xy,i} = \text{Current Speed}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
+CurrentDirection_{xy,i} = \text{Current Direction}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
+GlaucusSpeed_{i,j} = \text{Swimming Speed}\,\text{for}\, Individual_{j }\text{ at}\,\text{Time = }\,i \\
+Y_{prey} = \text{Y coordinate of closest prey for}\, Individual_{j } \text{ at Time = } i \\
+X_{prey} = \text{X coordinate of closest prey for}\, Individual_{j } \text{ at Time = } i \\
+Prey = ∀Physalia \\
+C = \begin{cases}
+1, & \text{if Prey within } Detection Range_j \\
+0, & \text{if Prey beyond } Detection Range_j
+\end{cases}
+\]
+
+The movement of Glaucus atlanticus depends on physical and biological
+parameters. For iteration i of the model, the position of an individual
+is given by the x and y coordinate. The displacement between time = i
+and time = i + 1 is given by above equations. The effects of winds and
+current depend on i) the speed in km/h and ii) the direction in radians.
+Sin(direction) then gives vertical (north-south) displacement, whilst
+cos(direction) gives horizontal (east-west). To illustrate, if wind is
+blowing from the east, direction equals 1.5 * pi. Displacement can then
+be calculated as:
+
+\[
+\Delta_{x} = sin(1.5 * pi) * speed = -1*speed \\
+\Delta_{y} = cos(1.5*pi) = 0 \\
+\text{Thus, wind from the east will move an individual to the west}
+\]
+
+In addition, we allow Glaucus to make small directed movements towards
+prey, if their prey is within a certain `detection zone'. The size of
+this detection zone depends on the chemodetection abilities of an
+individual glaucus. If a prey item is within the zone, we calculate the
+angle in radians between the predator and the prey, and multiply this
+new direction by the speed of that particular glaucus. The glaucus will
+always move to the closest prey item it detects.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Movement of Glaucus}
+\NormalTok{glaucusMovement }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(glaucus, physalia)\{}
+  
+  \CommentTok{\# Check the glaucus is not beached}
+  \ControlFlowTok{if}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{\textgreater{}} \DecValTok{1}\NormalTok{)\{}
+\NormalTok{    glaucus}\SpecialCharTok{$}\NormalTok{col }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}steelblue\textquotesingle{}}
+    
+    
+    \DocumentationTok{\#\#\# Predator module}
+    
+    \CommentTok{\# Glaucus are predators. They can detect prey from distance using chemical cues. We want to simulate these capabilities}
+    \CommentTok{\# by allowing glaucus limited movement to a target, if the target is within reasonable range.}
+    
+    \CommentTok{\# scan area for each glaucus}
+    \CommentTok{\# Convert to spatial geometries to allow geometric operations.}
+\NormalTok{    spat.point }\OtherTok{\textless{}{-}} \FunctionTok{st\_point}\NormalTok{(}\FunctionTok{c}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{x, glaucus}\SpecialCharTok{$}\NormalTok{y))}
+    
+    \CommentTok{\# We can decide what a reasonable buffer is. This might be a parameter tied to the }
+    \CommentTok{\# individual Glaucus!}
+\NormalTok{    detection.zone }\OtherTok{\textless{}{-}} \FunctionTok{st\_buffer}\NormalTok{(spat.point, glaucus}\SpecialCharTok{$}\NormalTok{chemodetection)}
+
+    \CommentTok{\# Find the Physalia that are within the detection zone.}
+    \CommentTok{\# needs to be in df format!!!1 vectorise all at once.}
+    
+\NormalTok{    physalia.df }\OtherTok{\textless{}{-}} \FunctionTok{rbindlist}\NormalTok{(physalia, }\AttributeTok{fill =}\NormalTok{ T)}
+    
+\NormalTok{    physalia.df.spat }\OtherTok{\textless{}{-}} \FunctionTok{st\_as\_sf}\NormalTok{(physalia.df , }\AttributeTok{coords =} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}x\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}y\textquotesingle{}}\NormalTok{))}
+    
+    \CommentTok{\# Any prey in the detection zone?}
+    \ControlFlowTok{if}\NormalTok{(}\FunctionTok{any}\NormalTok{(}\FunctionTok{st\_intersects}\NormalTok{(physalia.df.spat, detection.zone, }\AttributeTok{sparse =}\NormalTok{ F)))\{}
+      \CommentTok{\# Find the nearest Physalia}
+      \FunctionTok{print}\NormalTok{(}\StringTok{\textquotesingle{}Attack!\textquotesingle{}}\NormalTok{)}
+\NormalTok{      glaucus.target }\OtherTok{\textless{}{-}}\NormalTok{ physalia.df.spat[[}\FunctionTok{st\_nearest\_feature}\NormalTok{(spat.point, physalia.df.spat),}\StringTok{\textquotesingle{}geometry\textquotesingle{}}\NormalTok{]]}
+      \CommentTok{\# Now make it move towards the target. We want to use a random walk{-}esque}
+      \CommentTok{\# movement with bias towards the physalia.}
+      
+\NormalTok{      target\_angle }\OtherTok{\textless{}{-}} \FunctionTok{atan2}\NormalTok{(glaucus.target[}\DecValTok{2}\NormalTok{] }\SpecialCharTok{{-}}\NormalTok{ glaucus}\SpecialCharTok{$}\NormalTok{y, glaucus.target[}\DecValTok{1}\NormalTok{] }\SpecialCharTok{{-}}\NormalTok{ glaucus}\SpecialCharTok{$}\NormalTok{x) }\CommentTok{\# atan2 calculates the angle to get from y to x}
+\NormalTok{      glaucus}\SpecialCharTok{$}\NormalTok{x }\OtherTok{\textless{}{-}}\NormalTok{ glaucus}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{+}\NormalTok{ glaucus}\SpecialCharTok{$}\NormalTok{speed }\SpecialCharTok{*} \FunctionTok{sin}\NormalTok{(target\_angle)}
+\NormalTok{      glaucus}\SpecialCharTok{$}\NormalTok{y }\OtherTok{\textless{}{-}}\NormalTok{ glaucus}\SpecialCharTok{$}\NormalTok{y }\SpecialCharTok{+}\NormalTok{  glaucus}\SpecialCharTok{$}\NormalTok{speed }\SpecialCharTok{*} \FunctionTok{cos}\NormalTok{(target\_angle)}
+      
+\NormalTok{    \}}
+
+  
+    \CommentTok{\# Now account for effect of current and wind on glaucus.  }
+    
+    \CommentTok{\# Positional update rules: this IS the movement of a Glaucus}
+\NormalTok{    glaucus}\SpecialCharTok{$}\NormalTok{x }\OtherTok{\textless{}{-}} \FunctionTok{max}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{+} \FloatTok{0.005}\SpecialCharTok{*}\NormalTok{wind\_strength[}\FunctionTok{round}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{x,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{), }
+                                               \FunctionTok{round}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)] }\SpecialCharTok{*} \FunctionTok{sin}\NormalTok{(wind\_direction[}\FunctionTok{round}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{x,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{), }
+                                                                                                  \FunctionTok{round}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)]) }\SpecialCharTok{+}
+\NormalTok{                       current\_strength[}\FunctionTok{round}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{x,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{), }
+                                        \FunctionTok{round}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)] }\SpecialCharTok{*} \FunctionTok{sin}\NormalTok{(current\_direction[}\FunctionTok{round}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{x,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{), }
+                                                                                              \FunctionTok{round}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)]),}\DecValTok{0}\NormalTok{)}
+    
+    \CommentTok{\# Y movement (north {-} south) uses cosine function}
+\NormalTok{    glaucus}\SpecialCharTok{$}\NormalTok{y }\OtherTok{\textless{}{-}} \FunctionTok{max}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{y }\SpecialCharTok{+} \FloatTok{0.005}\SpecialCharTok{*}\NormalTok{wind\_strength[}\FunctionTok{round}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{x,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{), }
+                                               \FunctionTok{round}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)] }\SpecialCharTok{*} \FunctionTok{cos}\NormalTok{(wind\_direction[}\FunctionTok{round}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{x,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{), }
+                                                                                                  \FunctionTok{round}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)]) }\SpecialCharTok{+}
+\NormalTok{                       current\_strength[}\FunctionTok{round}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{x,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{), }
+                                        \FunctionTok{round}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)] }\SpecialCharTok{*} \FunctionTok{cos}\NormalTok{(current\_direction[}\FunctionTok{round}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{x,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{), }
+                                                                                              \FunctionTok{round}\NormalTok{(glaucus}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)]),}\DecValTok{0}\NormalTok{)}
+    
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{\{}
+\NormalTok{    glaucus}\SpecialCharTok{$}\NormalTok{col }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}red\textquotesingle{}}
+\NormalTok{    glaucus}\SpecialCharTok{$}\NormalTok{status }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}BEACHED\textquotesingle{}} \CommentTok{\# status 1 is beached}
+\NormalTok{  \}}
+  \FunctionTok{return}\NormalTok{(glaucus)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{physalia-physalis}{%
+\subsubsection{2.2.2 Physalia physalis}\label{physalia-physalis}}
+
+\[
+X_{ij+1} = X_{ij} + 0.0266*(WindSpeed_{{xy,i}} * sin(WindDirection_{xy,i}+ D_{ij})) + CurrentSpeed_{xy,i} * sin(CurrentDirection_{xy,i}) \\
+Y_{ij+1} = Y_{ij} + 0.0266*(WindSpeed_{{xy,i}} * cos(WindDirection_{xy,i}+ D_{ij})) + CurrentSpeed_{xy,i} * cos(CurrentDirection_{xy,i})
+\] \textbf{\emph{Where:}} \[
+X_{ij+1} = \text{Position}\,\text{along}\,\text{the}\,\text{East-West}\,\text{Axis for}\,Individual_{j }\text{ at}\,\text{Time = }\,i+1 \\
+X_{ij} = \text{Position}\,\text{along}\,\text{the}\,\text{East-West}\,\text{Axis for}\,Individual_{j }\text{ at}\,\text{Time = }\,i \\
+Y_{ij+1} = \text{Position}\,\text{along}\,\text{the}\,\text{North-South}\,\text{Axis for}\,Individual_{j }\text{ at}\,\text{Time = }\,i+1 \\
+Y_{ij} = \text{Position}\,\text{along}\,\text{the}\,\text{North-South}\,\text{Axis for}\,Individual_{j }\text{ at}\,\text{Time = }\,i \\
+WindSpeed_{xy,i} = \text{Wind Speed}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
+WindDirection_{xy,i} = \text{Wind Direction}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
+CurrentSpeed_{xy,i} = \text{Current Speed}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
+CurrentDirection_{xy,i} = \text{Current Direction}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
+D_{ij} = \begin{cases}
+normal(pi/3, 0.1) & \text{if Orientation}_j = Right \\
+normal(-pi/3,0.1) & \text{if Orientation}_j = Left
+\end{cases} \text{at Time = } i \\
+Orientation_j = \text{Sail Orientation of Individual}_j \text{ at Time = } i
+\]
+
+Physalia moves at \textasciitilde2.66\% the speed of the wind (REF).
+Left-sailed individuals will be pushed in a direction 50 degrees to the
+left of the prevailing wind, whilst right handed individuals move 50
+degrees to the right of prevailing winds. The effect of currents on
+physalia is described using the same equations as for Glaucus.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Movement of Physalia}
+\NormalTok{physaliaMovement }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(physalia, glaucus)\{}
+  
+  \CommentTok{\# Boundary conditions for movement}
+  \ControlFlowTok{if}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{\textgreater{}=} \DecValTok{100} \SpecialCharTok{|}\NormalTok{ physalia}\SpecialCharTok{$}\NormalTok{y }\SpecialCharTok{\textgreater{}=} \DecValTok{100} \SpecialCharTok{|}\NormalTok{ physalia}\SpecialCharTok{$}\NormalTok{y }\SpecialCharTok{\textless{}=} \DecValTok{0}\NormalTok{)\{ }
+\NormalTok{    physalia}\SpecialCharTok{$}\NormalTok{col }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}green\textquotesingle{}} 
+\NormalTok{    physalia}\SpecialCharTok{$}\NormalTok{status }\OtherTok{\textless{}{-}} \DecValTok{2}
+    \FunctionTok{return}\NormalTok{(physalia)\}}
+  
+  \CommentTok{\# Live condition}
+    \ControlFlowTok{if}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{\textgreater{}} \DecValTok{1} \SpecialCharTok{\&}\NormalTok{ physalia}\SpecialCharTok{$}\NormalTok{status }\SpecialCharTok{!=} \StringTok{\textquotesingle{}EATEN\textquotesingle{}}\NormalTok{)\{}
+\NormalTok{    physalia}\SpecialCharTok{$}\NormalTok{col }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}purple\textquotesingle{}}
+    
+    \CommentTok{\# This is a very important part. We have right and left=handed bluebottles}
+    \CommentTok{\# They drift in opposite directions {-} presumably to sustain populations.}
+    \CommentTok{\# We need to account for this properly. In addition, we want to add some}
+    \CommentTok{\# stochasticity to the movement. This is due to inherent variability}
+    \CommentTok{\# in the shape and size of bluebottles, but also due to waves etc.}
+    
+    \ControlFlowTok{if}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{orientation }\SpecialCharTok{==} \StringTok{\textquotesingle{}right\textquotesingle{}}\NormalTok{) \{direction\_offset }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\FloatTok{0.1}\NormalTok{)}\SpecialCharTok{*}\NormalTok{pi}\SpecialCharTok{/}\DecValTok{3}\NormalTok{\} }\CommentTok{\# right{-}handed drift at 50 degrees from wind direction.}
+    \ControlFlowTok{if}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{orientation }\SpecialCharTok{==} \StringTok{\textquotesingle{}left\textquotesingle{}}\NormalTok{) \{direction\_offset }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{1}\NormalTok{,}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{,}\FloatTok{0.1}\NormalTok{)}\SpecialCharTok{*}\NormalTok{pi}\SpecialCharTok{/}\DecValTok{3}\NormalTok{\} }\CommentTok{\# left handed drift at}
+
+    \CommentTok{\# Positional update rules: this IS the movement of physalia}
+    \CommentTok{\# Wind larger impact on physalia due to sail}
+    \CommentTok{\# physalia also have an offset {-} their sails change the way they interact}
+    \CommentTok{\# with wind {-} this is one of the cool parts in the model.}
+    \CommentTok{\# 0.0266 {-} see Lee, Schaeffer, Groeskamp (2021)}
+\NormalTok{    physalia}\SpecialCharTok{$}\NormalTok{x }\OtherTok{\textless{}{-}} \FunctionTok{max}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{+} \FloatTok{0.0266}\SpecialCharTok{*}\NormalTok{(wind\_strength[}\FunctionTok{round}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{x,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{), }
+                                                   \FunctionTok{round}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)]) }\SpecialCharTok{*} \FunctionTok{sin}\NormalTok{(wind\_direction[}\FunctionTok{round}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{x,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{), }
+                                                                                                       \FunctionTok{round}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)]}\SpecialCharTok{+}\NormalTok{ direction\_offset) }\SpecialCharTok{+}
+\NormalTok{                      current\_strength[}\FunctionTok{round}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{x,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{), }
+                                         \FunctionTok{round}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)] }\SpecialCharTok{*} \FunctionTok{sin}\NormalTok{(current\_direction[}\FunctionTok{round}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{x,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{), }
+                                                                                                \FunctionTok{round}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)]),}\DecValTok{0}\NormalTok{)}
+    
+    \CommentTok{\# Y movement (north {-} south) uses cosine function}
+\NormalTok{    physalia}\SpecialCharTok{$}\NormalTok{y }\OtherTok{\textless{}{-}} \FunctionTok{max}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{y }\SpecialCharTok{+} \FloatTok{0.0266}\SpecialCharTok{*}\NormalTok{(wind\_strength[}\FunctionTok{round}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{x,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{), }
+                                                   \FunctionTok{round}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)]) }\SpecialCharTok{*} \FunctionTok{cos}\NormalTok{(wind\_direction[}\FunctionTok{round}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{x,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{), }
+                                                                                                       \FunctionTok{round}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)] }\SpecialCharTok{+}\NormalTok{ direction\_offset) }\SpecialCharTok{+}
+\NormalTok{                       current\_strength[}\FunctionTok{round}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{x,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{), }
+                                         \FunctionTok{round}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)] }\SpecialCharTok{*} \FunctionTok{cos}\NormalTok{(current\_direction[}\FunctionTok{round}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{x,}\AttributeTok{digits =} \DecValTok{2}\NormalTok{), }
+                                                                                                \FunctionTok{round}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)]),}\DecValTok{0}\NormalTok{)}
+    
+    \DocumentationTok{\#\#\# Predator module}
+    
+    \CommentTok{\# We want to simulate damage to the physalia, i.e. being killed by a predator.}
+    \CommentTok{\# We use a simple rule: if the glaucus is within feeding range of the physalai}
+    \CommentTok{\# for 3 timesteps, the physalia has been eaten completely. The glaucus will then also}
+    \CommentTok{\# move on as we delete the physalia. }
+    
+    \CommentTok{\# Convert to spatial geometries to allow geometric operations.}
+\NormalTok{    spat.point }\OtherTok{\textless{}{-}} \FunctionTok{st\_point}\NormalTok{(}\FunctionTok{c}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{x, physalia}\SpecialCharTok{$}\NormalTok{y))}
+    
+    \CommentTok{\# We can decide what a reasonable buffer is. This is the same for}
+    \CommentTok{\# all physalia. 50 cm seems reasonable}
+\NormalTok{    under.attack.zone }\OtherTok{\textless{}{-}} \FunctionTok{st\_buffer}\NormalTok{(spat.point, }\FloatTok{0.0005}\NormalTok{)}
+    
+    \CommentTok{\# Check if there is a predator nearby}
+\NormalTok{    glaucus.df }\OtherTok{\textless{}{-}} \FunctionTok{rbindlist}\NormalTok{(glaucus, }\AttributeTok{fill =}\NormalTok{ T)}
+\NormalTok{    glaucus.df.spat }\OtherTok{\textless{}{-}} \FunctionTok{st\_as\_sf}\NormalTok{(glaucus.df , }\AttributeTok{coords =} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}x\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}y\textquotesingle{}}\NormalTok{))}
+    
+    \CommentTok{\# Any predators in the detection zone?}
+    \ControlFlowTok{if}\NormalTok{(}\FunctionTok{any}\NormalTok{(}\FunctionTok{st\_intersects}\NormalTok{(glaucus.df.spat, under.attack.zone, }\AttributeTok{sparse =}\NormalTok{ F)))\{}
+      \CommentTok{\# If yes, the physalia is \textquotesingle{}under attack\textquotesingle{}}
+\NormalTok{      physalia}\SpecialCharTok{$}\NormalTok{underattack }\OtherTok{\textless{}{-}}\NormalTok{ physalia}\SpecialCharTok{$}\NormalTok{underattack }\SpecialCharTok{+} \DecValTok{1}
+\NormalTok{    \}}
+    
+    \ControlFlowTok{if}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{underattack }\SpecialCharTok{\textgreater{}=} \DecValTok{3}\NormalTok{)\{}
+\NormalTok{      physalia}\SpecialCharTok{$}\NormalTok{status }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}EATEN\textquotesingle{}}
+\NormalTok{    \}}
+    
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{\{}
+\NormalTok{    physalia}\SpecialCharTok{$}\NormalTok{col }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}red\textquotesingle{}}
+    \ControlFlowTok{if}\NormalTok{(physalia}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{\textless{}} \DecValTok{1}\NormalTok{)\{}
+\NormalTok{      physalia}\SpecialCharTok{$}\NormalTok{status }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}BEACHED\textquotesingle{}} \CommentTok{\# status 1 is beached}
+\NormalTok{    \}}
+\NormalTok{  \}}
+  \FunctionTok{return}\NormalTok{(physalia)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{biological-interactions}{%
+\subsubsection{2.3 Biological
+Interactions}\label{biological-interactions}}
+
+Both Physalia and Glaucus are allowed to interact with each other in our
+model, and this affects their movements. Glaucus will seek out nearby
+physalia as described in section 2.2.1. However, they may also `latch'
+on to a physalia. This emulates feeding behaviour in which Glaucus move
+within the tentacles of a physalia: Glaucus may then move with the
+physalia, until it stops feeding or completely depletes the resource.
+Consequently, the time it takes to deplete the resource equals the time
+it takes for a Physalia to be killed. We assume that an individual
+physalia cannot survive unlimited attacks by Glaucus, and thus an
+individual that spends more than REF X hours `under attack' will be
+assigned the status `EATEN' and no further movements are simulated. Any
+Glaucus that was `latched on' to the deceased prey, or one that simply
+stops feeding, then reverts to their regular movement equations.
+
+\hypertarget{model-simulation-and-parameter-screening}{%
+\section{3. Model Simulation and Parameter
+Screening}\label{model-simulation-and-parameter-screening}}
+
+\hypertarget{simulation-function}{%
+\subsection{3.1 Simulation Function}\label{simulation-function}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Main function that runs the simulation}
+\NormalTok{simBlueFleet }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(nTimes,n\_rows, n\_cols, nPhysalia, nGlaucus,}
+\NormalTok{                         strength\_current, strength\_wind,}
+\NormalTok{                         dir\_wind, dir\_current,}
+\NormalTok{                         glaucus\_Chemodetection, glaucus\_Speed, iniSpace)\{}
+  
+  \CommentTok{\# Assign wind and current speed and direction to each grid cell.}
+  \CommentTok{\# Based on param input}
+\NormalTok{  current\_strength }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{rep}\NormalTok{(strength\_current,n\_rows}\SpecialCharTok{*}\NormalTok{n\_cols), }
+                              \AttributeTok{nrow=}\NormalTok{n\_rows)}
+\NormalTok{  wind\_strength }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{rep}\NormalTok{(strength\_wind,n\_rows}\SpecialCharTok{*}\NormalTok{n\_cols), }
+                           \AttributeTok{nrow=}\NormalTok{n\_rows)}
+  
+  \CommentTok{\# Wind and current directions}
+  
+\NormalTok{  wind\_direction }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{rep}\NormalTok{(dir\_wind, n\_rows}\SpecialCharTok{*}\NormalTok{n\_cols), }
+                            \AttributeTok{nrow=}\NormalTok{n\_rows, }\AttributeTok{ncol=}\NormalTok{n\_cols)}
+\NormalTok{  current\_direction }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{rep}\NormalTok{(dir\_current, n\_rows}\SpecialCharTok{*}\NormalTok{n\_cols), }
+                               \AttributeTok{nrow=}\NormalTok{n\_rows, }\AttributeTok{ncol=}\NormalTok{n\_cols)}
+  
+  
+  \DocumentationTok{\#\#\# Instantiate model agents}
+  
+  \CommentTok{\# Glaucus atlanticus individuals}
+  \FunctionTok{print}\NormalTok{(}\StringTok{\textquotesingle{}Generating animals\textquotesingle{}}\NormalTok{)}
+  \CommentTok{\# Our individuals also have attributes. Glaucus are our predators.}
+  \CommentTok{\# They will seek out Physalia, and are capable of (very limited)}
+  \CommentTok{\# powered movement. }
+  
+\NormalTok{  glaucus }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nGlaucus) \{}
+\NormalTok{    glaucus[[i]] }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(}
+      \AttributeTok{x =} \FunctionTok{round}\NormalTok{(}\FunctionTok{runif}\NormalTok{(}\DecValTok{1}\NormalTok{, iniSpace}\SpecialCharTok{$}\NormalTok{xmin, iniSpace}\SpecialCharTok{$}\NormalTok{xmax), }\AttributeTok{digits =} \DecValTok{0}\NormalTok{),}
+      \AttributeTok{y =} \FunctionTok{round}\NormalTok{(}\FunctionTok{runif}\NormalTok{(}\DecValTok{1}\NormalTok{,iniSpace}\SpecialCharTok{$}\NormalTok{ymin, iniSpace}\SpecialCharTok{$}\NormalTok{ymax),}\AttributeTok{digits =} \DecValTok{0}\NormalTok{),}
+      \AttributeTok{chemodetection =}\NormalTok{ glaucus\_Chemodetection, }
+      \AttributeTok{speed =} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{1}\NormalTok{,glaucus\_Speed, }\AttributeTok{sd =}\NormalTok{ glaucus\_Speed}\SpecialCharTok{/}\DecValTok{4}\NormalTok{),}
+      \AttributeTok{status =} \StringTok{\textquotesingle{}ALIVE\textquotesingle{}}
+\NormalTok{    )}
+\NormalTok{  \}}
+  
+  \CommentTok{\# Set up bluebottle movement and functions. Bluebottles can be right}
+  \CommentTok{\# or left handed.}
+\NormalTok{  physalia }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nPhysalia) \{}
+\NormalTok{    physalia[[i]] }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(}
+      \AttributeTok{x =} \FunctionTok{round}\NormalTok{(}\FunctionTok{runif}\NormalTok{(}\DecValTok{1}\NormalTok{, iniSpace}\SpecialCharTok{$}\NormalTok{xmin, iniSpace}\SpecialCharTok{$}\NormalTok{xmax), }\AttributeTok{digits =} \DecValTok{0}\NormalTok{),}
+      \AttributeTok{y =} \FunctionTok{round}\NormalTok{(}\FunctionTok{runif}\NormalTok{(}\DecValTok{1}\NormalTok{, iniSpace}\SpecialCharTok{$}\NormalTok{ymin, iniSpace}\SpecialCharTok{$}\NormalTok{ymax),}\AttributeTok{digits =} \DecValTok{0}\NormalTok{),}
+      \AttributeTok{underattack =} \DecValTok{0}\NormalTok{,}
+      \AttributeTok{status =} \StringTok{\textquotesingle{}ALIVE\textquotesingle{}}\NormalTok{,}
+      \AttributeTok{orientation =} \FunctionTok{sample}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}left\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}right\textquotesingle{}}\NormalTok{),}\DecValTok{1}\NormalTok{)}
+\NormalTok{    )}
+\NormalTok{  \}}
+  
+  \FunctionTok{print}\NormalTok{(}\StringTok{\textquotesingle{}Simulating Dynamics\textquotesingle{}}\NormalTok{)}
+\NormalTok{  GlaucusSim }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+\NormalTok{  PhysaliaSim }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+
+  \CommentTok{\# Run model over nTimes steps.}
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nTimes)\{}
+
+    \CommentTok{\# Update Physalia movement}
+    \ControlFlowTok{for}\NormalTok{(k }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nPhysalia)\{}
+      
+      \CommentTok{\# This function updates the position of all simulated}
+      \CommentTok{\# Physalia. Also tracks their \textquotesingle{}status\textquotesingle{}, which may be one}
+      \CommentTok{\# of \textquotesingle{}ALIVE\textquotesingle{}, \textquotesingle{}BEACHED\textquotesingle{}, or \textquotesingle{}EATEN\textquotesingle{}.}
+\NormalTok{      physalia[[k]] }\OtherTok{\textless{}{-}} \FunctionTok{physaliaMovement}\NormalTok{(physalia[[k]], glaucus)}
+\NormalTok{    \}}
+
+\NormalTok{    PhysaliaSim[[i]] }\OtherTok{\textless{}{-}} \FunctionTok{rbindlist}\NormalTok{(physalia)}
+    
+    
+    \CommentTok{\# Update Glaucus movement. Status includes \textquotesingle{}BEACHED\textquotesingle{} or \textquotesingle{}ALIVE\textquotesingle{}.}
+    \ControlFlowTok{for}\NormalTok{(j }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nGlaucus)\{}
+\NormalTok{      glaucus[[j]] }\OtherTok{\textless{}{-}} \FunctionTok{glaucusMovement}\NormalTok{(glaucus[[j]], physalia)}
+      
+\NormalTok{    \}}
+\NormalTok{    GlaucusSim[[i]] }\OtherTok{\textless{}{-}} \FunctionTok{rbindlist}\NormalTok{(glaucus)}
+\NormalTok{  \}}
+\NormalTok{  simResults }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(}\StringTok{\textquotesingle{}GlaucusStats\textquotesingle{}} \OtherTok{=}\NormalTok{ GlaucusSim,}
+                     \StringTok{\textquotesingle{}PhysaliaSim\textquotesingle{}} \OtherTok{=}\NormalTok{ PhysaliaSim)}
+  \FunctionTok{return}\NormalTok{(simResults)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{bash-script-for-parameter-screening}{%
+\subsection{3.2 Bash Script for Parameter
+Screening}\label{bash-script-for-parameter-screening}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{touch}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{results}{%
+\section{4. Results}\label{results}}
+
+\hypertarget{conclusion}{%
+\section{5. Conclusion}\label{conclusion}}
+
+\hypertarget{references}{%
+\section{6. References}\label{references}}
+
+\end{document}

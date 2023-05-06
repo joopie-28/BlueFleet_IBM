@@ -11,7 +11,7 @@
 
 <meta name="author" content="J.M. Sassen" />
 
-<meta name="date" content="2023-04-30" />
+<meta name="date" content="2023-05-01" />
 
 <title>Predator, prey and strandings: An IBM approach to modelling the ‘Blue Fleet’</title>
 
@@ -353,7 +353,7 @@ display: none;
 <h1 class="title toc-ignore">Predator, prey and strandings: An IBM
 approach to modelling the ‘Blue Fleet’</h1>
 <h4 class="author">J.M. Sassen</h4>
-<h4 class="date">2023-04-30</h4>
+<h4 class="date">2023-05-01</h4>
 
 </div>
 
@@ -362,8 +362,15 @@ approach to modelling the ‘Blue Fleet’</h1>
 <div id="introduction" class="section level1">
 <h1>1. Introduction</h1>
 <p>I have two simple questions: - Do different animals of the blue fleet
-have differential probabilities of wind and current driven beaching? -
-Do ecological interactions impact the propbability of beaching?</p>
+have differential probabilities of wind and current driven beaching?</p>
+<ul>
+<li><p>Investigate this by comparing beaching metrics for different
+groups for varying wind and current speeds.</p></li>
+<li><p>we also perform one model screen where wind direction changes
+over time.</p></li>
+<li><p>Do ecological interactions impact the probability of
+beaching?</p></li>
+</ul>
 </div>
 <div id="model-elaboration" class="section level1">
 <h1>2. Model Elaboration</h1>
@@ -410,22 +417,22 @@ the biological interactions that occur on the scale of centimeters.</p>
 <div id="glaucus-atlanticus" class="section level3">
 <h3>2.2.1 Glaucus atlanticus</h3>
 <p><span class="math display">\[
-X_{ij+1} = X_{ij} + WindSpeed_{{xy,i}} * sin(WindDirection_{xy,i}) +
+X_{j,i+1} = X_{ij} + WindSpeed_{{xy,i}} * sin(WindDirection_{xy,i}) +
 CurrentSpeed_{xy,i} * sin(CurrentDirection_{xy,i}) + C *
 (GlaucusSpeed_{ij} * sin(atan(Y_{Prey} - Y_i, X_{Prey} - X_i)))
 \]</span> <span class="math display">\[
-Y_{ij+1} = Y_{ij} + WindSpeed_{{xy,i}} * cos(WindDirection_{xy,i}) +
+Y_{j,i+1} = Y_{ij} + WindSpeed_{{xy,i}} * cos(WindDirection_{xy,i}) +
 CurrentSpeed_{xy,i} * cos(CurrentDirection_{xy,i}) + C *
 (GlaucusSpeed_{ij} * cos(atan(Y_{Prey} - Y_{ij}, X_{Prey} - X_{ij} )) )
 \]</span> <strong><em>Where:</em></strong></p>
 <p><span class="math display">\[
-X_{ij+1} =
+X_{j,i+1} =
 \text{Position}\,\text{along}\,\text{the}\,\text{East-West}\,\text{Axis
 for}\,Individual_{j }\text{ at}\,\text{Time = }\,i+1 \\
 X_{ij} =
 \text{Position}\,\text{along}\,\text{the}\,\text{East-West}\,\text{Axis
 for}\,Individual_{j }\text{ at}\,\text{Time = }\,i \\
-Y_{ij+1} =
+Y_{j,i+1} =
 \text{Position}\,\text{along}\,\text{the}\,\text{North-South}\,\text{Axis
 for}\,Individual_{j }\text{ at}\,\text{Time = }\,i+1 \\
 Y_{ij} =
@@ -445,6 +452,7 @@ Y_{prey} = \text{Y coordinate of closest prey for}\, Individual_{j }
 \text{ at Time = } i \\
 X_{prey} = \text{X coordinate of closest prey for}\, Individual_{j }
 \text{ at Time = } i \\
+Prey = ∀Physalia \\
 C = \begin{cases}
 1, &amp; \text{if Prey within } Detection Range_j \\
 0, &amp; \text{if Prey beyond } Detection Range_j
@@ -547,20 +555,20 @@ glaucusMovement &lt;- function(glaucus, physalia){
 <div id="physalia-physalis" class="section level3">
 <h3>2.2.2 Physalia physalis</h3>
 <p><span class="math display">\[
-X_{ij+1} = X_{ij} + 0.0266*(WindSpeed_{{xy,i}} *
+X_{j,i+1} = X_{ij} + 0.0266*(WindSpeed_{{xy,i}} *
 sin(WindDirection_{xy,i}+ D_{ij})) + CurrentSpeed_{xy,i} *
 sin(CurrentDirection_{xy,i}) \\
-Y_{ij+1} = Y_{ij} + 0.0266*(WindSpeed_{{xy,i}} *
+Y_{j,i+1} = Y_{ij} + 0.0266*(WindSpeed_{{xy,i}} *
 cos(WindDirection_{xy,i}+ D_{ij})) + CurrentSpeed_{xy,i} *
 cos(CurrentDirection_{xy,i})
 \]</span> <strong><em>Where:</em></strong> <span class="math display">\[
-X_{ij+1} =
+X_{j,i+1} =
 \text{Position}\,\text{along}\,\text{the}\,\text{East-West}\,\text{Axis
 for}\,Individual_{j }\text{ at}\,\text{Time = }\,i+1 \\
 X_{ij} =
 \text{Position}\,\text{along}\,\text{the}\,\text{East-West}\,\text{Axis
 for}\,Individual_{j }\text{ at}\,\text{Time = }\,i \\
-Y_{ij+1} =
+Y_{j,i+1} =
 \text{Position}\,\text{along}\,\text{the}\,\text{North-South}\,\text{Axis
 for}\,Individual_{j }\text{ at}\,\text{Time = }\,i+1 \\
 Y_{ij} =

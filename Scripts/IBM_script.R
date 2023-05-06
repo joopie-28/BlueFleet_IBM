@@ -248,16 +248,45 @@ simBlueFleet <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
 }
 
 # Custom function for drawing a glaucus
-draw.Glaucus <- function(center, scaling = 1){
-  coords_body = as.matrix(data.frame('x'=(c(5,7,8.2,8.5,7,6,8,10,10,10,8,6,6,5,4,4,2,0,0,0,2,4,3,1.5,1.8,3,5) * scaling) + center[1],
-                                     "y"=(c(2, 8,7,8,8,9,10.5,10,11,12,11,12,13.5,14,13.5,12,11,12,11,10,10.5,9,8,8,7,8,2)*10 * scaling) + center[2]))
-  coords_stripe = as.matrix(data.frame('x'=(c(5,4.5,4.5,4.2,5.8,5.5,5.5,5)*scaling) + center[1],
-                                       "y"=(c(4.5,8,12.5,13,13,12.5,8,4.5)*10*scaling)+ center[2]))
+draw.Glaucus <- function(center, scaling){
+  coords_body = as.matrix(data.frame('x'=(c(5,7,8.2,8.5,7,6,8,10,10,10,8,6,6,5,4,4,2,0,0,0,2,4,3,1.5,1.8,3,5)) + center[1],
+                                     "y"=(c(2, 8,7,8,8,9,10.5,10,11,12,11,12,13.5,14,13.5,12,11,12,11,10,10.5,9,8,8,7,8,2)) + center[2]))
+  coords_stripe = as.matrix(data.frame('x'=(c(5,4.5,4.5,4.2,5.8,5.5,5.5,5)) + center[1],
+                                       "y"=(c(4.5,8,12.5,13,13,12.5,8,4.5))+ center[2]))
   Glaucus_Body <- st_polygon(list(coords_body))
   Glaucus_Stripe <- st_polygon(list(coords_stripe))
-  plot(Glaucus_Body, col = 'skyblue', add =T)
-  plot(Glaucus_Stripe, col = 'blue', add = T)
+  plot(Glaucus_Body*scaling, col = 'skyblue', add =T)
+  plot(Glaucus_Stripe*scaling, col = 'blue', add = T)
 }
+
+draw.Physalia<- function(center, orientation){
+  if(orientation == 'left'){
+  coords_body = as.matrix(data.frame('x'=c(4,4.5, 5, 5.5, 6.3, 6.6, 6.3, 6, 4.8, 4) + center[1],
+                                     "y"=c(5,6, 6.2, 6.2, 6, 5.9, 5.4,4.9, 4.8,5)+center[2]))
+  }else{
+  coords_body = as.matrix(data.frame('x'=5-(c(4,4.5, 5, 5.5, 6.3, 6.6, 6.3, 6, 4.8,4)-5)+center[1],
+                                       "y"=c(5,6, 6.2, 6.2, 6, 5.9, 5.4,4.9, 4.8,5)+center[2]))
+  }
+  
+  phys_Body <- st_polygon(list(coords_body))
+  
+  
+  for (i in seq(0,1.8,0.2)){
+    phys_Body <-  as.matrix(data.frame('x'=(((c(4,4,4.2,4))+i+0.1)+center[1]),
+                                       
+                                       'y'=(c(5,4,3.6,5)+0.2)+center[2])) |>
+      list()|>
+      st_polygon() |>
+      st_union(phys_Body)
+  }
+
+    plot(phys_Body, col = 'blue', add =T)
+}
+
+
+
+
+draw.Physalia(center=c(40,50), orientation='right')
 
 # Movement of Glaucus with extra interaction
 glaucusMovement.ext <- function(glaucus, physalia){
@@ -375,8 +404,8 @@ nGlaucus = 25
 
 # Wind and current speeds (in km/H).
 # Param recommended options:
-strength_current = 1.5
-strength_wind = 10
+strength_current = 15
+strength_wind = 25
 
 # Wind and current directions
 # We use radians to denote directions. Feasible parameter values are therefore:
@@ -486,11 +515,7 @@ saveGIF({
     abline(v=1, lty=2, col='red')
     for(k in 1:nPhysalia){
       physalia[k,] <- physaliaMovement(physalia[k,], glaucus)
-      points(x=physalia$x[k],
-             y=physalia$y[k],
-             col = ifelse(physalia$orientation[k] == 'left', 'purple', 'yellow'),
-             pch = 19,
-             cex = 0.5)
+      draw.Physalia(c(physalia$x[k], physalia$y[k]), orientation = physalia$orientation[k], scaling = .025)
     }
     for(j in 1:nGlaucus){
       glaucus[j,] <- glaucusMovement.ext(glaucus[j,], physalia)
