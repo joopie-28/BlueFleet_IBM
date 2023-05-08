@@ -20,6 +20,7 @@ physaliaMovement <- function(physalia, glaucus){
   if(physalia$y >= 100 | physalia$y <= 1){ 
     return(physalia)}
   
+
   # Live condition
   if(physalia$x > 1 & physalia$status != 'EATEN'){
     physalia$col <- 'purple'
@@ -249,50 +250,53 @@ simBlueFleet <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
 
 # Custom function for drawing a glaucus
 draw.Glaucus <- function(center, scaling){
-  coords_body = as.matrix(data.frame('x'=(c(5,7,8.2,8.5,7,6,8,10,10,10,8,6,6,5,4,4,2,0,0,0,2,4,3,1.5,1.8,3,5)) + center[1],
-                                     "y"=(c(2, 8,7,8,8,9,10.5,10,11,12,11,12,13.5,14,13.5,12,11,12,11,10,10.5,9,8,8,7,8,2)) + center[2]))
-  coords_stripe = as.matrix(data.frame('x'=(c(5,4.5,4.5,4.2,5.8,5.5,5.5,5)) + center[1],
-                                       "y"=(c(4.5,8,12.5,13,13,12.5,8,4.5))+ center[2]))
+  coords_body = as.matrix(data.frame('x'=(c(5,7,8.2,8.5,7,6,8,10,10,10,8,6,6,5,4,4,2,0,0,0,2,4,3,1.5,1.8,3,5)-5)*scaling + center[1],
+                                     "y"=(c(2, 8,7,8,8,9,10.5,10,11,12,11,12,13.5,14,13.5,12,11,12,11,10,10.5,9,8,8,7,8,2)-14)*scaling + center[2]))
+  coords_stripe = as.matrix(data.frame('x'=(c(5,4.5,4.5,4.2,5.8,5.5,5.5,5)-5)*scaling + center[1],
+                                       "y"=(c(4.5,8,12.5,13,13,12.5,8,4.5)-14)*scaling+ center[2]))
   Glaucus_Body <- st_polygon(list(coords_body))
   Glaucus_Stripe <- st_polygon(list(coords_stripe))
-  plot(Glaucus_Body*scaling, col = 'skyblue', add =T)
-  plot(Glaucus_Stripe*scaling, col = 'blue', add = T)
+  plot(Glaucus_Body, col = 'skyblue', add =T)
+  plot(Glaucus_Stripe, col = 'blue', add = T)
 }
 
-draw.Physalia<- function(center, orientation){
+draw.Physalia<- function(center, orientation,scaling=1){
   if(orientation == 'left'){
-  coords_body = as.matrix(data.frame('x'=c(4,4.5, 5, 5.5, 6.3, 6.6, 6.3, 6, 4.8, 4) + center[1],
-                                     "y"=c(5,6, 6.2, 6.2, 6, 5.9, 5.4,4.9, 4.8,5)+center[2]))
+  coords_body = as.matrix(data.frame('x'=(c(4,4.5, 5, 5.5, 6.3, 6.6, 6.3, 6, 4.8, 4)-5.8)*scaling ,
+                                     "y"=(c(5,6, 6.2, 6.2, 6, 5.9, 5.4,4.9, 4.8,5)-6)*scaling))
   }else{
-  coords_body = as.matrix(data.frame('x'=5-(c(4,4.5, 5, 5.5, 6.3, 6.6, 6.3, 6, 4.8,4)-5)+center[1],
-                                       "y"=c(5,6, 6.2, 6.2, 6, 5.9, 5.4,4.9, 4.8,5)+center[2]))
+  coords_body = as.matrix(data.frame('x'=((5-(c(4,4.5, 5, 5.5, 6.3, 6.6, 6.3, 6, 4.8,4)-5)-5.8))*scaling,
+                                       "y"=(c(5,6, 6.2, 6.2, 6, 5.9, 5.4,4.9, 4.8,5)-6)*scaling))
   }
   
   phys_Body <- st_polygon(list(coords_body))
   
   
   for (i in seq(0,1.8,0.2)){
-    phys_Body <-  as.matrix(data.frame('x'=(((c(4,4,4.2,4))+i+0.1)+center[1]),
+    phys_Body <-  as.matrix(data.frame('x'=(((c(4,4,4.2,4))+i-5.8)*scaling),
                                        
-                                       'y'=(c(5,4,3.6,5)+0.2)+center[2])) |>
+                                       'y'=(c(5,4,3.6,5)+0.2-6)*scaling)) |>
       list()|>
       st_polygon() |>
       st_union(phys_Body)
   }
-
+  
+    phys_Body[[1]][,1] <- phys_Body[[1]][,1] + center[1]
+    phys_Body[[1]][,2] <- phys_Body[[1]][,2] + center[2]
+    
     plot(phys_Body, col = 'blue', add =T)
 }
 
 
 
 
-draw.Physalia(center=c(40,50), orientation='right')
+draw.Physalia(center=c(58,60), orientation='right', scaling=1)
 
 # Movement of Glaucus with extra interaction
 glaucusMovement.ext <- function(glaucus, physalia){
   # Boundary conditions for movement, i.e. out of frame
   if(glaucus$y >= 100 | glaucus$y <= 1){ 
-    return(glaucus)}
+   return(glaucus)}
   
   # First check if glaucus are 'latched on' to physalia which will 
   # affect their movement.
@@ -307,11 +311,31 @@ glaucusMovement.ext <- function(glaucus, physalia){
     glaucus$target_ID <- sample(size=1, x = c(glaucus$target_ID, NA), prob = probs) # NA corresponds to letting go.
     
   }else{
+
     
     # Check the glaucus is not beached
     if(glaucus$x > 1){
       glaucus$col <- 'steelblue'
+    
       
+      
+      # Now account for effect of current and wind on glaucus.  
+      
+      # Positional update rules: this IS the movement of a Glaucus
+      glaucus$x <- max(glaucus$x + 0.001*wind_strength[round(glaucus$y,digits = 2), 
+                                                       round(glaucus$x, digits = 2)] * sin(wind_direction[round(glaucus$y,digits = 2), 
+                                                                                                          round(glaucus$x, digits = 2)]) +
+                        0.001 *current_strength[round(glaucus$y,digits = 2), 
+                                          round(glaucus$x, digits = 2)] * sin(current_direction[round(glaucus$y,digits = 2), 
+                                                                                                round(glaucus$x, digits = 2)]),0)
+      
+      # Y movement (north - south) uses cosine function
+      glaucus$y <- max(glaucus$y + 0.001*wind_strength[round(glaucus$y,digits = 2), 
+                                                       round(glaucus$x, digits = 2)] * cos(wind_direction[round(glaucus$y,digits = 2), 
+                                                                                                          round(glaucus$x, digits = 2)]) +
+                        0.001 * current_strength[round(glaucus$y,digits = 2), 
+                                          round(glaucus$x, digits = 2)] * cos(current_direction[round(glaucus$y,digits = 2), 
+                                                                                                round(glaucus$x, digits = 2)]),0)
       
       ### Predator module
       
@@ -339,8 +363,8 @@ glaucusMovement.ext <- function(glaucus, physalia){
         # movement with bias towards the physalia.
         
         target_angle <- atan2(glaucus.target[2] - glaucus$y, glaucus.target[1] - glaucus$x) # atan2 calculates the angle to get from y to x
-        glaucus$x <- glaucus$x + glaucus$speed * sin(target_angle)
-        glaucus$y <- glaucus$y +  glaucus$speed * cos(target_angle)
+        glaucus$x <- glaucus$x + glaucus$speed * cos(target_angle) # switch????
+        glaucus$y <- glaucus$y +  glaucus$speed * sin(target_angle)
         
         # Latch-on module
         eating.zone <- st_buffer(spat.point, 0.0005) # 0.5 meters is our spatial resolution
@@ -353,23 +377,9 @@ glaucusMovement.ext <- function(glaucus, physalia){
       }
       
       
-      # Now account for effect of current and wind on glaucus.  
       
-      # Positional update rules: this IS the movement of a Glaucus
-      glaucus$x <- max(glaucus$x + 0.001*wind_strength[round(glaucus$y,digits = 2), 
-                                                       round(glaucus$x, digits = 2)] * sin(wind_direction[round(glaucus$y,digits = 2), 
-                                                                                                          round(glaucus$x, digits = 2)]) +
-                        0.001 *current_strength[round(glaucus$y,digits = 2), 
-                                          round(glaucus$x, digits = 2)] * sin(current_direction[round(glaucus$y,digits = 2), 
-                                                                                                round(glaucus$x, digits = 2)]),0)
       
-      # Y movement (north - south) uses cosine function
-      glaucus$y <- max(glaucus$y + 0.001*wind_strength[round(glaucus$y,digits = 2), 
-                                                       round(glaucus$x, digits = 2)] * cos(wind_direction[round(glaucus$y,digits = 2), 
-                                                                                                          round(glaucus$x, digits = 2)]) +
-                        0.001 * current_strength[round(glaucus$y,digits = 2), 
-                                          round(glaucus$x, digits = 2)] * cos(current_direction[round(glaucus$y,digits = 2), 
-                                                                                                round(glaucus$x, digits = 2)]),0)
+      
       
     } else{
       glaucus$status <- 'BEACHED' # status 1 is beached
