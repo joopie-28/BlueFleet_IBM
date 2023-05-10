@@ -10,8 +10,48 @@ library(tidyverse)
 library(sf)
 library(data.table)
 library(animation)
+library(extraDistr)
 
 #### 1. Define Functions ####
+
+# Custom functions for drawing pictograms
+draw.Glaucus <- function(center, scaling){
+  coords_body = as.matrix(data.frame('x'=(c(5,7,8.2,8.5,7,6,8,10,10,10,8,6,6,5,4,4,2,0,0,0,2,4,3,1.5,1.8,3,5)-5)*scaling + center[1],
+                                     "y"=(c(2, 8,7,8,8,9,10.5,10,11,12,11,12,13.5,14,13.5,12,11,12,11,10,10.5,9,8,8,7,8,2)-14)*scaling + center[2]))
+  coords_stripe = as.matrix(data.frame('x'=(c(5,4.5,4.5,4.2,5.8,5.5,5.5,5)-5)*scaling + center[1],
+                                       "y"=(c(4.5,8,12.5,13,13,12.5,8,4.5)-14)*scaling+ center[2]))
+  Glaucus_Body <- st_polygon(list(coords_body))
+  Glaucus_Stripe <- st_polygon(list(coords_stripe))
+  plot(Glaucus_Body, col = 'skyblue', add =T)
+  plot(Glaucus_Stripe, col = 'blue', add = T)
+}
+
+draw.Physalia<- function(center, orientation,scaling=1){
+  if(orientation == 'left'){
+    coords_body = as.matrix(data.frame('x'=(c(4,4.5, 5, 5.5, 6.3, 6.6, 6.3, 6, 4.8, 4)-5.8)*scaling ,
+                                       "y"=(c(5,6, 6.2, 6.2, 6, 5.9, 5.4,4.9, 4.8,5)-6)*scaling))
+  }else{
+    coords_body = as.matrix(data.frame('x'=((5-(c(4,4.5, 5, 5.5, 6.3, 6.6, 6.3, 6, 4.8,4)-5)-5.8))*scaling,
+                                       "y"=(c(5,6, 6.2, 6.2, 6, 5.9, 5.4,4.9, 4.8,5)-6)*scaling))
+  }
+  
+  phys_Body <- st_polygon(list(coords_body))
+  
+  
+  for (i in seq(0,1.8,0.2)){
+    phys_Body <-  as.matrix(data.frame('x'=(((c(4,4,4.2,4))+i-5.8)*scaling),
+                                       
+                                       'y'=(c(5,4,3.6,5)+0.2-6)*scaling)) |>
+      list()|>
+      st_polygon() |>
+      st_union(phys_Body)
+  }
+  
+  phys_Body[[1]][,1] <- phys_Body[[1]][,1] + center[1]
+  phys_Body[[1]][,2] <- phys_Body[[1]][,2] + center[2]
+  
+  plot(phys_Body, col = 'blue', add =T)
+}
 
 # Movement of Physalia
 physaliaMovement <- function(physalia, glaucus){
@@ -90,69 +130,98 @@ physaliaMovement <- function(physalia, glaucus){
   return(physalia)
 }
 
-# Movement of Glaucus
+# Movement of Glaucus with extra interaction
 glaucusMovement <- function(glaucus, physalia){
-  
   # Boundary conditions for movement, i.e. out of frame
   if(glaucus$y >= 100 | glaucus$y <= 1){ 
     return(glaucus)}
-  # Check the glaucus is not beached
-  if(glaucus$x > 1){
-    glaucus$col <- 'steelblue'
-    
-    
-    ### Predator module
-    
-    # Glaucus are predators. They can detect prey from distance using chemical cues. We want to simulate these capabilities
-    # by allowing glaucus limited movement to a target, if the target is within reasonable range.
-    
-    # scan area for each glaucus
-    # Convert to spatial geometries to allow geometric operations.
-    spat.point <- st_point(c(glaucus$x, glaucus$y))
-    
-    # We can decide what a reasonable buffer is. This might be a parameter tied to the 
-    # individual Glaucus!
-    detection.zone <- st_buffer(spat.point, glaucus$chemodetection)
-
-    # Find the Physalia that are within the detection zone.
-    
-    physalia.df.spat <- st_as_sf(physalia , coords = c('x', 'y'))
-    
-    # Any prey in the detection zone?
-    if(any(st_intersects(physalia.df.spat, detection.zone, sparse = F))){
-      # Find the nearest Physalia
-      print('Attack!')
-      glaucus.target <- physalia.df.spat[[st_nearest_feature(spat.point, physalia.df.spat),'geometry']]
-      # Now make it move towards the target. We want to use a random walk-esque
-      # movement with bias towards the physalia.
-      
-      target_angle <- atan2(glaucus.target[2] - glaucus$y, glaucus.target[1] - glaucus$x) # atan2 calculates the angle to get from y to x
-      glaucus$x <- glaucus$x + glaucus$speed * sin(target_angle)
-      glaucus$y <- glaucus$y +  glaucus$speed * cos(target_angle)
-      
-    }
-
   
-    # Now account for effect of current and wind on glaucus.  
+  # First check if glaucus are 'latched on' to physalia which will 
+  # affect their movement.
+  if(!is.na(glaucus$target_ID) & physalia[glaucus$target_ID,'status'][1] != 'EATEN'){
+    glaucus$x <- physalia[glaucus$target_ID,'x']
+    glaucus$y <- physalia[glaucus$target_ID,'y']
+    glaucus$latch_time <- glaucus$latch_time + 1
     
-    # Positional update rules: this IS the movement of a Glaucus
-    glaucus$x <- max(glaucus$x + 0.001*wind_strength[round(glaucus$x,digits = 2), 
-                                                     round(glaucus$y, digits = 2)] * sin(wind_direction[round(glaucus$x,digits = 2), 
-                                                                                                        round(glaucus$y, digits = 2)]) +
-                       0.001 *current_strength[round(glaucus$x,digits = 2), 
-                                               round(glaucus$y, digits = 2)] * sin(current_direction[round(glaucus$x,digits = 2), 
-                                                                                                     round(glaucus$y, digits = 2)]),0)
+    # Probability of glaucus detaching follows a beta prime distribution.
+    # Shape of distribtution set to match expected behaviour.
+    probs <- c(1-pbetapr(glaucus$latch_time, 24, 5), pbetapr(glaucus$latch_time, 24, 5))
+    glaucus$target_ID <- sample(size=1, x = c(glaucus$target_ID, NA), prob = probs) # NA corresponds to letting go.
     
-    # Y movement (north - south) uses cosine function
-    glaucus$y <- max(glaucus$y + 0.001*wind_strength[round(glaucus$x,digits = 2), 
-                                                     round(glaucus$y, digits = 2)] * cos(wind_direction[round(glaucus$x,digits = 2), 
-                                                                                                        round(glaucus$y, digits = 2)]) +
-                       0.001 * current_strength[round(glaucus$x,digits = 2), 
-                                                round(glaucus$y, digits = 2)] * cos(current_direction[round(glaucus$x,digits = 2), 
-                                                                                                      round(glaucus$y, digits = 2)]),0)
+  }else{
     
-  } else{
-    glaucus$status <- 'BEACHED' 
+    
+    # Check the glaucus is not beached
+    if(glaucus$x > 1){
+      glaucus$col <- 'steelblue'
+      
+      
+      
+      # Now account for effect of current and wind on glaucus.  
+      
+      # Positional update rules: this IS the movement of a Glaucus
+      glaucus$x <- max(glaucus$x + 0.005*wind_strength[round(glaucus$y,digits = 2), 
+                                                       round(glaucus$x, digits = 2)] * sin(wind_direction[round(glaucus$y,digits = 2), 
+                                                                                                          round(glaucus$x, digits = 2)]) +
+                         0.001 *current_strength[round(glaucus$y,digits = 2), 
+                                                 round(glaucus$x, digits = 2)] * sin(current_direction[round(glaucus$y,digits = 2), 
+                                                                                                       round(glaucus$x, digits = 2)]),0)
+      
+      # Y movement (north - south) uses cosine function
+      glaucus$y <- max(glaucus$y + 0.005*wind_strength[round(glaucus$y,digits = 2), 
+                                                       round(glaucus$x, digits = 2)] * cos(wind_direction[round(glaucus$y,digits = 2), 
+                                                                                                          round(glaucus$x, digits = 2)]) +
+                         0.001 * current_strength[round(glaucus$y,digits = 2), 
+                                                  round(glaucus$x, digits = 2)] * cos(current_direction[round(glaucus$y,digits = 2), 
+                                                                                                        round(glaucus$x, digits = 2)]),0)
+      
+      ### Predator module
+      
+      # Glaucus are predators. They can detect prey from distance using chemical cues. We want to simulate these capabilities
+      # by allowing glaucus limited movement to a target, if the target is within reasonable range.
+      
+      # scan area for each glaucus
+      # Convert to spatial geometries to allow geometric operations.
+      spat.point <- st_point(c(glaucus$x, glaucus$y))
+      
+      # We can decide what a reasonable buffer is. This might be a parameter tied to the 
+      # individual Glaucus!
+      detection.zone <- st_buffer(spat.point, glaucus$chemodetection)
+      
+      # Find the Physalia that are within the detection zone.
+      
+      physalia.df.spat <- st_as_sf(physalia , coords = c('x', 'y'))
+      
+      # Any prey in the detection zone?
+      if(any(st_intersects(physalia.df.spat, detection.zone, sparse = F))){
+        # Find the nearest Physalia
+        print('Attack!')
+        glaucus.target <- physalia.df.spat[[st_nearest_feature(spat.point, physalia.df.spat),'geometry']]
+        # Now make it move towards the target. We want to use a random walk-esque
+        # movement with bias towards the physalia.
+        
+        target_angle <- atan2(glaucus.target[2] - glaucus$y, glaucus.target[1] - glaucus$x) # atan2 calculates the angle to get from y to x
+        glaucus$x <- glaucus$x + glaucus$speed * cos(target_angle) # switch????
+        glaucus$y <- glaucus$y +  glaucus$speed * sin(target_angle)
+        
+        # Latch-on module
+        eating.zone <- st_buffer(spat.point, 0.0005) # 0.5 meters is our spatial resolution
+        if(any(st_intersects(physalia.df.spat, eating.zone, sparse = F))){
+          # Identify the prey to latch on to
+          glaucus$target_ID = which(st_intersects(physalia.df.spat, eating.zone, sparse = F) == T)
+          glaucus$latch_time = 1
+          
+        }
+      }
+      
+      
+      
+      
+      
+      
+    } else{
+      glaucus$status <- 'BEACHED' # status 1 is beached
+    }
   }
   return(glaucus)
 }
@@ -238,7 +307,7 @@ simBlueFleet <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
     
     # Update Glaucus movement. Status includes 'BEACHED' or 'ALIVE'.
     for(j in 1:nGlaucus){
-      glaucus[j,] <- glaucusMovement.ext(glaucus[j,], physalia)
+      glaucus[j,] <- glaucusMovement(glaucus[j,], physalia)
       
     }
     GlaucusSim[[i]] <- glaucus
@@ -247,147 +316,6 @@ simBlueFleet <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
                      'PhysaliaSim' = PhysaliaSim)
   return(simResults)
 }
-
-# Custom function for drawing a glaucus
-draw.Glaucus <- function(center, scaling){
-  coords_body = as.matrix(data.frame('x'=(c(5,7,8.2,8.5,7,6,8,10,10,10,8,6,6,5,4,4,2,0,0,0,2,4,3,1.5,1.8,3,5)-5)*scaling + center[1],
-                                     "y"=(c(2, 8,7,8,8,9,10.5,10,11,12,11,12,13.5,14,13.5,12,11,12,11,10,10.5,9,8,8,7,8,2)-14)*scaling + center[2]))
-  coords_stripe = as.matrix(data.frame('x'=(c(5,4.5,4.5,4.2,5.8,5.5,5.5,5)-5)*scaling + center[1],
-                                       "y"=(c(4.5,8,12.5,13,13,12.5,8,4.5)-14)*scaling+ center[2]))
-  Glaucus_Body <- st_polygon(list(coords_body))
-  Glaucus_Stripe <- st_polygon(list(coords_stripe))
-  plot(Glaucus_Body, col = 'skyblue', add =T)
-  plot(Glaucus_Stripe, col = 'blue', add = T)
-}
-
-draw.Physalia<- function(center, orientation,scaling=1){
-  if(orientation == 'left'){
-  coords_body = as.matrix(data.frame('x'=(c(4,4.5, 5, 5.5, 6.3, 6.6, 6.3, 6, 4.8, 4)-5.8)*scaling ,
-                                     "y"=(c(5,6, 6.2, 6.2, 6, 5.9, 5.4,4.9, 4.8,5)-6)*scaling))
-  }else{
-  coords_body = as.matrix(data.frame('x'=((5-(c(4,4.5, 5, 5.5, 6.3, 6.6, 6.3, 6, 4.8,4)-5)-5.8))*scaling,
-                                       "y"=(c(5,6, 6.2, 6.2, 6, 5.9, 5.4,4.9, 4.8,5)-6)*scaling))
-  }
-  
-  phys_Body <- st_polygon(list(coords_body))
-  
-  
-  for (i in seq(0,1.8,0.2)){
-    phys_Body <-  as.matrix(data.frame('x'=(((c(4,4,4.2,4))+i-5.8)*scaling),
-                                       
-                                       'y'=(c(5,4,3.6,5)+0.2-6)*scaling)) |>
-      list()|>
-      st_polygon() |>
-      st_union(phys_Body)
-  }
-  
-    phys_Body[[1]][,1] <- phys_Body[[1]][,1] + center[1]
-    phys_Body[[1]][,2] <- phys_Body[[1]][,2] + center[2]
-    
-    plot(phys_Body, col = 'blue', add =T)
-}
-
-
-
-
-draw.Physalia(center=c(58,60), orientation='right', scaling=1)
-
-# Movement of Glaucus with extra interaction
-glaucusMovement.ext <- function(glaucus, physalia){
-  # Boundary conditions for movement, i.e. out of frame
-  if(glaucus$y >= 100 | glaucus$y <= 1){ 
-   return(glaucus)}
-  
-  # First check if glaucus are 'latched on' to physalia which will 
-  # affect their movement.
-  if(!is.na(glaucus$target_ID) & physalia[glaucus$target_ID,'status'][1] != 'EATEN'){
-    glaucus$x <- physalia[glaucus$target_ID,'x']
-    glaucus$y <- physalia[glaucus$target_ID,'y']
-    glaucus$latch_time <- glaucus$latch_time + 1
-    
-    # Probability of glaucus detaching follows a beta prime distribution.
-    # Shape of distribtution set to match expected behaviour.
-    probs <- c(1-pbetapr(glaucus$latch_time, 24, 5), pbetapr(glaucus$latch_time, 24, 5))
-    glaucus$target_ID <- sample(size=1, x = c(glaucus$target_ID, NA), prob = probs) # NA corresponds to letting go.
-    
-  }else{
-
-    
-    # Check the glaucus is not beached
-    if(glaucus$x > 1){
-      glaucus$col <- 'steelblue'
-    
-      
-      
-      # Now account for effect of current and wind on glaucus.  
-      
-      # Positional update rules: this IS the movement of a Glaucus
-      glaucus$x <- max(glaucus$x + 0.001*wind_strength[round(glaucus$y,digits = 2), 
-                                                       round(glaucus$x, digits = 2)] * sin(wind_direction[round(glaucus$y,digits = 2), 
-                                                                                                          round(glaucus$x, digits = 2)]) +
-                        0.001 *current_strength[round(glaucus$y,digits = 2), 
-                                          round(glaucus$x, digits = 2)] * sin(current_direction[round(glaucus$y,digits = 2), 
-                                                                                                round(glaucus$x, digits = 2)]),0)
-      
-      # Y movement (north - south) uses cosine function
-      glaucus$y <- max(glaucus$y + 0.001*wind_strength[round(glaucus$y,digits = 2), 
-                                                       round(glaucus$x, digits = 2)] * cos(wind_direction[round(glaucus$y,digits = 2), 
-                                                                                                          round(glaucus$x, digits = 2)]) +
-                        0.001 * current_strength[round(glaucus$y,digits = 2), 
-                                          round(glaucus$x, digits = 2)] * cos(current_direction[round(glaucus$y,digits = 2), 
-                                                                                                round(glaucus$x, digits = 2)]),0)
-      
-      ### Predator module
-      
-      # Glaucus are predators. They can detect prey from distance using chemical cues. We want to simulate these capabilities
-      # by allowing glaucus limited movement to a target, if the target is within reasonable range.
-      
-      # scan area for each glaucus
-      # Convert to spatial geometries to allow geometric operations.
-      spat.point <- st_point(c(glaucus$x, glaucus$y))
-      
-      # We can decide what a reasonable buffer is. This might be a parameter tied to the 
-      # individual Glaucus!
-      detection.zone <- st_buffer(spat.point, glaucus$chemodetection)
-      
-      # Find the Physalia that are within the detection zone.
-      
-      physalia.df.spat <- st_as_sf(physalia , coords = c('x', 'y'))
-      
-      # Any prey in the detection zone?
-      if(any(st_intersects(physalia.df.spat, detection.zone, sparse = F))){
-        # Find the nearest Physalia
-        print('Attack!')
-        glaucus.target <- physalia.df.spat[[st_nearest_feature(spat.point, physalia.df.spat),'geometry']]
-        # Now make it move towards the target. We want to use a random walk-esque
-        # movement with bias towards the physalia.
-        
-        target_angle <- atan2(glaucus.target[2] - glaucus$y, glaucus.target[1] - glaucus$x) # atan2 calculates the angle to get from y to x
-        glaucus$x <- glaucus$x + glaucus$speed * cos(target_angle) # switch????
-        glaucus$y <- glaucus$y +  glaucus$speed * sin(target_angle)
-        
-        # Latch-on module
-        eating.zone <- st_buffer(spat.point, 0.0005) # 0.5 meters is our spatial resolution
-        if(any(st_intersects(physalia.df.spat, eating.zone, sparse = F))){
-          # Identify the prey to latch on to
-          glaucus$target_ID = which(st_intersects(physalia.df.spat, eating.zone, sparse = F) == T)
-          glaucus$latch_time = 1
-          
-        }
-      }
-      
-      
-      
-      
-      
-      
-    } else{
-      glaucus$status <- 'BEACHED' # status 1 is beached
-    }
-  }
-  return(glaucus)
-}
-
 
 #### 2. Run Simulations ####
 
@@ -444,6 +372,29 @@ BFS<-simBlueFleet(nTimes=nTimes, n_rows = n_rows, n_cols = n_cols, nPhysalia = n
                    strength_current = strength_current, strength_wind = strength_wind,
                    dir_wind = dir_wind, dir_current = dir_current, glaucus_Chemodetection = glaucus_Chemodetection,
                    glaucus_Speed = glaucus_Speed, iniSpace = iniSpace)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -504,7 +455,7 @@ for(strength.wind in wind_strength_range){
 
 
 
-
+#### End of Analyses ####
 
 
 
@@ -567,4 +518,75 @@ y <- dbetapr(x, a, b) # probability density values
 plot(x, y, type = "l", lwd = 2, xlab = "x", ylab = "Density", xlim = c(0,7),
      main = "Beta Prime Distribution with a = 2, b = 5")
 pbetapr(10, 2, 5)
+
+
+
+
+
+# Movement of Glaucus
+glaucusMovement <- function(glaucus, physalia){
+  
+  # Boundary conditions for movement, i.e. out of frame
+  if(glaucus$y >= 100 | glaucus$y <= 1){ 
+    return(glaucus)}
+  # Check the glaucus is not beached
+  if(glaucus$x > 1){
+    glaucus$col <- 'steelblue'
+    
+    
+    ### Predator module
+    
+    # Glaucus are predators. They can detect prey from distance using chemical cues. We want to simulate these capabilities
+    # by allowing glaucus limited movement to a target, if the target is within reasonable range.
+    
+    # scan area for each glaucus
+    # Convert to spatial geometries to allow geometric operations.
+    spat.point <- st_point(c(glaucus$x, glaucus$y))
+    
+    # We can decide what a reasonable buffer is. This might be a parameter tied to the 
+    # individual Glaucus!
+    detection.zone <- st_buffer(spat.point, glaucus$chemodetection)
+    
+    # Find the Physalia that are within the detection zone.
+    
+    physalia.df.spat <- st_as_sf(physalia , coords = c('x', 'y'))
+    
+    # Any prey in the detection zone?
+    if(any(st_intersects(physalia.df.spat, detection.zone, sparse = F))){
+      # Find the nearest Physalia
+      print('Attack!')
+      glaucus.target <- physalia.df.spat[[st_nearest_feature(spat.point, physalia.df.spat),'geometry']]
+      # Now make it move towards the target. We want to use a random walk-esque
+      # movement with bias towards the physalia.
+      
+      target_angle <- atan2(glaucus.target[2] - glaucus$y, glaucus.target[1] - glaucus$x) # atan2 calculates the angle to get from y to x
+      glaucus$x <- glaucus$x + glaucus$speed * sin(target_angle)
+      glaucus$y <- glaucus$y +  glaucus$speed * cos(target_angle)
+      
+    }
+    
+    
+    # Now account for effect of current and wind on glaucus.  
+    
+    # Positional update rules: this IS the movement of a Glaucus
+    glaucus$x <- max(glaucus$x + 0.001*wind_strength[round(glaucus$x,digits = 2), 
+                                                     round(glaucus$y, digits = 2)] * sin(wind_direction[round(glaucus$x,digits = 2), 
+                                                                                                        round(glaucus$y, digits = 2)]) +
+                       0.001 *current_strength[round(glaucus$x,digits = 2), 
+                                               round(glaucus$y, digits = 2)] * sin(current_direction[round(glaucus$x,digits = 2), 
+                                                                                                     round(glaucus$y, digits = 2)]),0)
+    
+    # Y movement (north - south) uses cosine function
+    glaucus$y <- max(glaucus$y + 0.001*wind_strength[round(glaucus$x,digits = 2), 
+                                                     round(glaucus$y, digits = 2)] * cos(wind_direction[round(glaucus$x,digits = 2), 
+                                                                                                        round(glaucus$y, digits = 2)]) +
+                       0.001 * current_strength[round(glaucus$x,digits = 2), 
+                                                round(glaucus$y, digits = 2)] * cos(current_direction[round(glaucus$x,digits = 2), 
+                                                                                                      round(glaucus$y, digits = 2)]),0)
+    
+  } else{
+    glaucus$status <- 'BEACHED' 
+  }
+  return(glaucus)
+}
 

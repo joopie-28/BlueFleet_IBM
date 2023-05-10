@@ -17,25 +17,31 @@ knitr::opts_chunk$set(echo = TRUE, incl = T)
 
 # 1. Introduction
 
-I have two simple questions:
-- Do different animals of the blue fleet have differential probabilities of wind and current driven beaching?
+<p align="justify">
+The blue fleet refers to a community of neustonic (i.e. drifting or floating with winds and currents) organisms, with a cosmopolitan distribution (Bourg *et al*., 2022). The community consists of several species of Cnidaria (Jellyfish and relatives) as well as a variety of Molluscs (Helm, 2021). Aggregations of these organisms may cover extremely large areas, sometimes spanning several kilometers. Whilst large fleets are generally confined to offshore areas, such as oceanic gyres, strong onshore winds and currents can cause mass strandings of these creatures (Bourg *et al*., 2022). This poses a risk to swimmers and beachgoers, as several constituent species possess the ability to envenomate people or animals upon touch (e.g. the Bluebottle). The exact dynamics driving stranding of harmful species are not completely understood, however this is an area of active research (e.g. Bourg *et al*., 2022; Lee *et al*., 2021). Interestingly, there is some variability in the number of species that one might find during a mass stranding event: sometimes we see all species strand, whilst at other times only one species may be recorded (Grove, 2010). This could be explained by the inherent morphological differences between the species that make up the blue fleet. For example, several cnidarians, including the bluebottle and the by-the-wind sailor (*Vellela vellela*), have evolved an enlarged membrane filled with gas that serves as a sail. Individual bluebottles come in a right or left-sailed orientation: these two morphotypes will drift in opposite directions from each other (Bourg *et al*., 2022; Lee *et al*., 2021). Other functional groups, such as the pelagic slugs that prey on the floating cnidarians, lack such structures. Thus, whilst all these species are considered part of the blue fleet, physical forces might affect them in different ways.
+</p>
+<p align="justify">
+Here, we simulate the drifting dynamics of two species that are part of the blue fleet: The bluebottle *Physalia physalis* (Cnidaria: Siphonophora) and The 'Blue Dragon' *Glaucus atlanticus* (Gastropoda: Nudibranchia), a pelagic sea slug and a predator of *P. physalis*. Drifting behaviour, and associated beaching probabilities for each species were investigated through the use of an Individual Based Model (IBM). We incorporate meaningful ecological interactions between the two species, such as predation, to promote realism of the drifting dynamics. Not much is known about how Blue Dragons find their prey. However, it is possible that they are capable of very limited directed movement, as well as chemodetection of nearby prey using specialised structures known as rhinophores (Valdes & Compillo, 2004). Helm (2021) found that different species of pelagic slugs had distinct unique predatory preferences and behaviours when exposed to prey in a laboratory environment. Alternatively, prey density might be so high that Blue Dragons simply rely on chance encounters with prey. By simulating this system with different combinations of prey densities and biophysical parameters, we aim to generate insights into how a small neustonic predator finds prey. 
+</p>
+<p align="justify">
+We thus strive to answer the following questions:
 
-- Investigate this by comparing beaching metrics for different groups for varying wind and current speeds.
-- we also perform one model screen where wind direction changes over time.
+1. *How do beaching probabilities differ between the two species?*
 
-- Do ecological interactions impact the probability of beaching? 
+2. *How do prey density, swimming speed and chemodetection affect the ability of a Blue Dragon to find prey?*
+</p>
 
 # 2. Model Elaboration
 
 ## 2.1 Conceptual Overview
 <p align="justify">
 The model is designed to investigate the effects of physical factors such as wind and ocean currents on the movement and behavior of the two species. We created a 50km x 10km grid, with a spatial resolution of 1 meter (5*10^9 total cells). Cells with x-values > 1km were assigned a 'land' status and all other cells where assigned an 'ocean' status. This resulted in a straight coastline stretching the left side of the grid, emulating the Eastern Australian Coastline. Each individual cell was then assigned a value for the following physical parameters: Wind Speed, Wind Direction, Current Speed, Current Direction. The temporal resolution was 1 hour. Thus, all speed parameters are in km/H, and each iteration represents 1 hour in real-time.
-
+</p>
+<p align="justify">
 The environment was then populated with individual Glaucus and Physalia, each with their own unique attributes. For glaucus, we assigned the following attributes: initial X coordinate, initial Y coordinate, chemodetection range, and movement speed. As both chemodetection and speed are traits that are expected to vary between Glaucus, these were assigned by drawing one value from a normal distribution with mean = LITERATURE and sd = LITERATURE. Individual Glaucus could end up beached or alive at the end of the simulation. For Physalia, the following attributes were assigned: initial X coordinate, initial Y coordinate and orientation. Orientation refers to the position of the sail relative to the tentacles: this comes in a 'right-handed' or 'left-handed' variation. This variable was assigned randomly for each individual. Individual physalia could end up beached, eaten, or alive at the end of the simulation.
-
+</p>
+<p align="justify">
 Whilst grid resolution was 1m, our model allows individuals to move through continuous space. The movement of an individual depends on the winds and current within the current cell, however the effect of these drivers might only amount to a movement of 20 cm within a timestep. This value is used to update the position of the individual. On the next iteration, the individual will simply 'feel' the same physical drivers, as it still finds itself in the same cell. This enables us to include the biological interactions that occur on the scale of centimeters. 
-
-
 </p>
 
 ## 2.2 Movement Equations
@@ -366,4 +372,12 @@ touch
 
 # 6. References
 
+Bourg, N., Schaeffer, A., Cetina-Heredia, P., Lawes, J. C., & Lee, D. (2022). Driving the blue fleet: Temporal variability and drivers behind bluebottle (Physalia physalis) beachings off Sydney, Australia. Plos one, 17(3), e0265593.
 
+Helm, R. R. (2021). Natural history of neustonic animals in the Sargasso Sea: reproduction, predation, and behavior of Glaucus atlanticus, Velella velella, and Janthina spp. Marine Biodiversity, 51(6), 99.
+
+Grove, S. (2010). Blow-ins from the Blue Fleet. The Tasmanian Naturalist, 132, 25-34.
+
+Lee, D., Schaeffer, A., & Groeskamp, S. (2021). Drifting Dynamics of the Bluebottle. Ocean Science Discussions, 2021, 1-21.
+
+Valdés, Á., & Campillo, O. A. (2004). Systematics of pelagic aeolid nudibranchs of the family Glaucidae (Mollusca, Gastropoda). Bulletin of Marine Science, 75(3), 381-389.
