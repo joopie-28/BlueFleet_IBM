@@ -269,12 +269,15 @@ physaliaMovement <- function(physalia, glaucus){
 
 ### 2.3 Biological Interactions
 <p align="justify">
-Both Physalia and Glaucus are allowed to interact with each other in our model, and this affects their movements. Glaucus will seek out nearby physalia as described in section 2.2.1. However, they may also 'latch' on to a physalia. This emulates feeding behaviour in which Glaucus move within the tentacles of a physalia: Glaucus may then move with the physalia, until it stops feeding or completely depletes the resource. Consequently, the time it takes to deplete the resource equals the time it takes for a Physalia to be killed. We assume that an individual physalia cannot survive unlimited attacks by Glaucus, and thus an individual that spends more than REF X hours 'under attack' will be assigned the status 'EATEN' and no further movements are simulated. Any Glaucus that was 'latched on' to the deceased prey, or one that simply stops feeding, then reverts to their regular movement equations. 
+Both Physalia and Glaucus are allowed to interact with each other in our model, and this affects their movements. Glaucus will seek out nearby physalia as described in section 2.2.1. However, they may also 'latch' on to a physalia. This emulates feeding behaviour in which Glaucus move within the tentacles of a physalia: Glaucus may then move with the physalia, until it stops feeding or completely depletes the resource. Consequently, the time it takes to deplete the resource equals the time it takes for a Physalia to be killed. We assume that an individual physalia cannot survive unlimited attacks by Glaucus, and thus an individual that spends more than REF X hours 'under attack' will be assigned the status 'EATEN' and no further movements are simulated. Any Glaucus that was 'latched on' to the deceased prey, or one that simply stops feeding, then reverts to their regular movement equations. A glaucus may also detach from prey before consuming it. We model this using a beta prime distribution (size params 24 and 5), by letting the probability of detaching equal the probability of observing a given latch time from the specified beta prime distribution. 
 </p>
 
 # 3. Model Simulation and Parameter Screening
+We analysed two model variants, one with stochastic wind and current directions, and one with fixed wind and currents directions (emulating East coast).
 
-## 3.1 Simulation Function
+# 3.1 Running Simulations
+
+## 3.2 Simulation Function
 ```{r FullSim, eval=F, include=TRUE}
 # Main function that runs the simulation
 simBlueFleet <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,

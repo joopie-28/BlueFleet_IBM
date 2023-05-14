@@ -170,5 +170,101 @@ saveGIF({
 
 
 
-#### GIF 3. 'Latchin on' behaviour ####
+#### GIF 3. 'Stochastic directions ####
+
+# Wind and current speeds (in km/H).
+# Param recommended options:
+# Grid spatial extent, each unit represents a kilometer
+n_cols <- 100
+n_rows <- 100
+
+strength_current = 2
+strength_wind = 20
+
+# Wind and current directions
+# We use radians to denote directions. Feasible parameter values are therefore:
+# any number between 1 and 2, where:
+# 'west' = 1.5 pi
+# 'east' = .5*pi
+# 'north' = 0
+# 'south' = pi
+
+dir_wind = 1.5*pi
+dir_current = pi
+
+nGlaucus <- 10
+glaucus <- data.frame(matrix(nrow=nGlaucus, ncol=8))
+colnames(glaucus) <- c("ID", "x", "y", "chemodetection", "speed", "latch_time", "target_ID", "status")
+for (i in 1:nGlaucus) {
+  glaucus[i,] <- list(
+    ID = i,
+    x = runif(1,80, 90),
+    y = runif(1,50, 60),
+    chemodetection = glaucus_Chemodetection, 
+    speed = rnorm(1,glaucus_Speed, sd = glaucus_Speed/4),
+    latch_time = 0,
+    target_ID = NA,
+    status = 'ALIVE'
+  )
+}
+
+# Set up bluebottle movement and functions. Bluebottles can be right
+# or left handed.
+nPhysalia <- 50
+physalia <- data.frame(matrix(nrow=nPhysalia, ncol=6))
+colnames(physalia) <- c("ID", "x", "y", "underattack", "status", "orientation")
+
+for (i in 1:nPhysalia) {
+  physalia[i,] <- list(
+    ID = i,
+    x = runif(1, 80, 90),
+    y = runif(1,50, 60),
+    underattack = 0,
+    status = 'ALIVE',
+    orientation = sample(c('left', 'right'),1)
+  )
+}
+
+rad2deg <- function(rad) {(rad * 180) / (pi)}
+saveGIF({
+  for(i in 1:1000){
+    print(i)
+    plot(1:105 ,1:105, type = 'n',
+         xlab = 'West - East ',
+         ylab = 'South - North', xlim=c(0,100))
+    text(x=20, y= 3,paste0('Time (Hours): ', i))
+    #Wind and current directions vary each hour, but within boundaries
+    # Wind and current directions vary each hour, but within boundaries
+    dir_wind = ifelse(rnorm(1, dir_wind, 0.1) > 3*pi, 3*pi, 
+                      ifelse(rnorm(1, dir_wind, 0.1) < 0*pi, 0*pi,
+                             rnorm(1, dir_wind, 0.1)))
+    
+    dir_current = ifelse(rnorm(1, dir_current, 0.1) > 3.5, 3.5, 
+                         ifelse(rnorm(1, dir_current, 0.1) < 2.9, 2.9,
+                                rnorm(1, dir_current, 0.1)))
+    
+    wind_direction <- matrix(rep(dir_wind, n_rows*n_cols), 
+                             nrow=n_rows, ncol=n_cols)
+    current_direction <-  matrix(rep(dir_current, n_rows*n_cols), 
+                                 nrow=n_rows, ncol=n_cols)
+           
+    for(t in seq(0,100,10)) {                       
+      arrows(x0= seq(0,100,5), x1 = seq(0,100,5) + 3* sin(dir_wind), y0=rep(100-t,20), y1=rep(100-t+3*cos(dir_wind), 20), col = rgb(0,0.5,1,0.8),length=.1)
+    }
+    for(t in seq(0,100,10)) { 
+      arrows(x0= seq(5,95,5), x1 =seq(5,95,5) + 3* sin(dir_current), y0=rep(95-t,19), y1=rep(95-t+3*cos(dir_current),19), col = rgb(0.5,0.3,0.8,0.5),length=.1)
+    }
+    
+    
+    for(k in 1:nPhysalia){
+      physalia[k,] <- physaliaMovement(physalia[k,], glaucus)
+      draw.Physalia(c(physalia$x[k], physalia$y[k]), orientation = physalia$orientation[k])
+    }
+    for(j in 1:nGlaucus){
+      glaucus[j,] <- glaucusMovement(glaucus[j,], physalia)
+      draw.Glaucus(c(glaucus$x[j], glaucus$y[j]), scaling=0.3)
+    }
+  }
+}, movie.name = "Stochastic_Directions.gif",interval = interval, ani.width = 500, ani.height = 500, fps = fps)
+
 

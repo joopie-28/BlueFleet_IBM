@@ -57,7 +57,7 @@ draw.Physalia<- function(center, orientation,scaling=1){
 physaliaMovement <- function(physalia, glaucus){
   
   # Boundary conditions for movement, i.e. out of frame
-  if(physalia$y >= 100 | physalia$y <= 1){ 
+  if(physalia$y >= 100 | physalia$y <= 1 | physalia$x >=100){ 
     return(physalia)}
   
 
@@ -133,15 +133,19 @@ physaliaMovement <- function(physalia, glaucus){
 # Movement of Glaucus with extra interaction
 glaucusMovement <- function(glaucus, physalia){
   # Boundary conditions for movement, i.e. out of frame
-  if(glaucus$y >= 100 | glaucus$y <= 1){ 
+  if(glaucus$y >= 100 | glaucus$y <= 1 | glaucus$x >= 100){ 
     return(glaucus)}
   
   # First check if glaucus are 'latched on' to physalia which will 
   # affect their movement.
+  
+  ##PROBLEM
+  
+  
   if(!is.na(glaucus$target_ID) & physalia[glaucus$target_ID,'status'][1] != 'EATEN'){
     glaucus$x <- physalia[glaucus$target_ID,'x']
     glaucus$y <- physalia[glaucus$target_ID,'y']
-    glaucus$latch_time <- glaucus$latch_time + 1
+    glaucus$latch_time <- glaucus$latch_time + 1 
     
     # Probability of glaucus detaching follows a beta prime distribution.
     # Shape of distribtution set to match expected behaviour.
@@ -196,7 +200,7 @@ glaucusMovement <- function(glaucus, physalia){
       if(any(st_intersects(physalia.df.spat, detection.zone, sparse = F))){
         # Find the nearest Physalia
         print('Attack!')
-        glaucus.target <- physalia.df.spat[[st_nearest_feature(spat.point, physalia.df.spat),'geometry']]
+        glaucus.target <- physalia.df.spat[[which.min(st_distance(spat.point, physalia.df.spat)),'geometry']]
         # Now make it move towards the target. We want to use a random walk-esque
         # movement with bias towards the physalia.
         
@@ -208,14 +212,11 @@ glaucusMovement <- function(glaucus, physalia){
         eating.zone <- st_buffer(spat.point, 0.0005) # 0.5 meters is our spatial resolution
         if(any(st_intersects(physalia.df.spat, eating.zone, sparse = F))){
           # Identify the prey to latch on to
-          glaucus$target_ID = which(st_intersects(physalia.df.spat, eating.zone, sparse = F) == T)
+          glaucus$target_ID = which(st_intersects(physalia.df.spat, eating.zone, sparse = F) == T)[1]
           glaucus$latch_time = 1
           
         }
       }
-      
-      
-      
       
       
       
@@ -227,7 +228,7 @@ glaucusMovement <- function(glaucus, physalia){
 }
 
 # Main function that runs the simulation
-simBlueFleet <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
+simBlueFleet.fixedPhys <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
                          strength_current, strength_wind,
                          dir_wind, dir_current,
                          glaucus_Chemodetection, glaucus_Speed, iniSpace){
@@ -292,6 +293,7 @@ simBlueFleet <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
 
   # Run model over nTimes steps.
   for (i in 1:nTimes){
+    print(i)
 
     # Update Physalia movement
     for(k in 1:nPhysalia){
@@ -316,6 +318,117 @@ simBlueFleet <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
                      'PhysaliaSim' = PhysaliaSim)
   return(simResults)
 }
+
+# Simulation version that allows wind and current directions to vary stochastically at each timestep.
+simBlueFleet.stochPhys <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
+                         strength_current, strength_wind,
+                         dir_wind, dir_current,
+                         glaucus_Chemodetection, glaucus_Speed, iniSpace){
+  
+  # Assign wind and current speed and direction to each grid cell.
+  # Based on param input
+  current_strength <- matrix(rep(strength_current,n_rows*n_cols), 
+                             nrow=n_rows)
+  wind_strength <- matrix(rep(strength_wind,n_rows*n_cols), 
+                          nrow=n_rows)
+  
+  # Wind and current directions
+  
+  wind_direction <- matrix(rep(dir_wind, n_rows*n_cols), 
+                           nrow=n_rows, ncol=n_cols)
+  current_direction <- matrix(rep(dir_current, n_rows*n_cols), 
+                              nrow=n_rows, ncol=n_cols)
+  
+  
+  ### Instantiate model agents
+  
+  # Glaucus atlanticus individuals
+  print('Generating animals')
+  # Our individuals also have attributes. Glaucus are our predators.
+  # They will seek out Physalia, and are capable of (very limited)
+  # powered movement. 
+  
+  glaucus <- data.frame(matrix(nrow=nGlaucus, ncol=8))
+  colnames(glaucus) <- c("ID", "x", "y", "chemodetection", "speed", "latch_time", "target_ID", "status")
+  for (i in 1:nGlaucus) {
+    glaucus[i,] <- list(
+      ID = i,
+      x = runif(1, iniSpace$xmin, iniSpace$xmax),
+      y = runif(1,iniSpace$ymin, iniSpace$ymax),
+      chemodetection = glaucus_Chemodetection, 
+      speed = rnorm(1,glaucus_Speed, sd = glaucus_Speed/4),
+      latch_time = 0,
+      target_ID = NA,
+      status = 'ALIVE'
+    )
+  }
+  
+  # Set up bluebottle movement and functions. Bluebottles can be right
+  # or left handed.
+  physalia <- data.frame(matrix(nrow=nPhysalia, ncol=6))
+  colnames(physalia) <- c("ID", "x", "y", "underattack", "status", "orientation")
+  
+  for (i in 1:nPhysalia) {
+    physalia[i,] <- list(
+      ID = i,
+      x = runif(1, iniSpace$xmin, iniSpace$xmax),
+      y = runif(1,iniSpace$ymin, iniSpace$ymax),
+      underattack = 0,
+      status = 'ALIVE',
+      orientation = sample(c('left', 'right'),1)
+    )
+  }
+  
+  print('Simulating Dynamics')
+  GlaucusSim <- list()
+  PhysaliaSim <- list()
+  
+  # Run model over nTimes steps.
+  for (i in 1:nTimes){
+    print(i)
+    
+    # Wind and current directions vary each hour, but within boundaries
+    dir_wind = ifelse(rnorm(1, dir_wind, 0.1) > 1.75*pi, 1.75*pi, 
+                      ifelse(rnorm(1, dir_wind, 0.1) < 1.25*pi, 1.25*pi,
+                             rnorm(1, dir_wind, 0.1)))
+    
+    dir_current = ifelse(rnorm(1, dir_current, 0.1) > 3.5, 3.5, 
+                         ifelse(rnorm(1, dir_current, 0.1) < 2.9, 2.9,
+                                rnorm(1, dir_current, 0.1)))
+                           
+    wind_direction <- matrix(rep(dir_wind, n_rows*n_cols), 
+                             nrow=n_rows, ncol=n_cols)
+    current_direction <- matrix(rep(dir_current, n_rows*n_cols), 
+                                nrow=n_rows, ncol=n_cols)
+    
+    # Update Physalia movement
+    for(k in 1:nPhysalia){
+      
+      # This function updates the position of all simulated
+      # Physalia. Also tracks their 'status', which may be one
+      # of 'ALIVE', 'BEACHED', or 'EATEN'.
+      physalia[k, ] <- physaliaMovement(physalia[k,], glaucus)
+    }
+    
+    PhysaliaSim[[i]] <- physalia
+    
+    
+    # Update Glaucus movement. Status includes 'BEACHED' or 'ALIVE'.
+    for(j in 1:nGlaucus){
+      glaucus[j,] <- glaucusMovement(glaucus[j,], physalia)
+      
+    }
+    GlaucusSim[[i]] <- glaucus
+  }
+  simResults <- list('GlaucusSim' = GlaucusSim,
+                     'PhysaliaSim' = PhysaliaSim)
+  return(simResults)
+}
+
+
+
+
+
 
 #### 2. Run Simulations ####
 
@@ -368,7 +481,7 @@ glaucus_Chemodetection <- 0.001
 glaucus_Speed <- 0.00015
 
 # Run the simulation
-BFS<-simBlueFleet(nTimes=nTimes, n_rows = n_rows, n_cols = n_cols, nPhysalia = nPhysalia, nGlaucus = nGlaucus,
+BFS<-simBlueFleet(nTimes=10, n_rows = n_rows, n_cols = n_cols, nPhysalia = nPhysalia, nGlaucus = nGlaucus,
                    strength_current = strength_current, strength_wind = strength_wind,
                    dir_wind = dir_wind, dir_current = dir_current, glaucus_Chemodetection = glaucus_Chemodetection,
                    glaucus_Speed = glaucus_Speed, iniSpace = iniSpace)

@@ -1,59 +1,18 @@
 # Install packages
 library(units, lib.loc=Sys.getenv("R_LIBS_USER"))
 library(rgeos, lib.loc=Sys.getenv("R_LIBS_USER"))
-library(tidyverse, lib.loc=Sys.getenv("R_LIBS_USER"))
+library(tidyverse)
 library(sf)
 library(data.table)
 library(extraDistr, lib.loc=Sys.getenv("R_LIBS_USER"))
 
-
-
 #### 1. Define Functions ####
-
-# Custom functions for drawing pictograms
-draw.Glaucus <- function(center, scaling){
-  coords_body = as.matrix(data.frame('x'=(c(5,7,8.2,8.5,7,6,8,10,10,10,8,6,6,5,4,4,2,0,0,0,2,4,3,1.5,1.8,3,5)-5)*scaling + center[1],
-                                     "y"=(c(2, 8,7,8,8,9,10.5,10,11,12,11,12,13.5,14,13.5,12,11,12,11,10,10.5,9,8,8,7,8,2)-14)*scaling + center[2]))
-  coords_stripe = as.matrix(data.frame('x'=(c(5,4.5,4.5,4.2,5.8,5.5,5.5,5)-5)*scaling + center[1],
-                                       "y"=(c(4.5,8,12.5,13,13,12.5,8,4.5)-14)*scaling+ center[2]))
-  Glaucus_Body <- st_polygon(list(coords_body))
-  Glaucus_Stripe <- st_polygon(list(coords_stripe))
-  plot(Glaucus_Body, col = 'skyblue', add =T)
-  plot(Glaucus_Stripe, col = 'blue', add = T)
-}
-
-draw.Physalia<- function(center, orientation,scaling=1){
-  if(orientation == 'left'){
-    coords_body = as.matrix(data.frame('x'=(c(4,4.5, 5, 5.5, 6.3, 6.6, 6.3, 6, 4.8, 4)-5.8)*scaling ,
-                                       "y"=(c(5,6, 6.2, 6.2, 6, 5.9, 5.4,4.9, 4.8,5)-6)*scaling))
-  }else{
-    coords_body = as.matrix(data.frame('x'=((5-(c(4,4.5, 5, 5.5, 6.3, 6.6, 6.3, 6, 4.8,4)-5)-5.8))*scaling,
-                                       "y"=(c(5,6, 6.2, 6.2, 6, 5.9, 5.4,4.9, 4.8,5)-6)*scaling))
-  }
-  
-  phys_Body <- st_polygon(list(coords_body))
-  
-  
-  for (i in seq(0,1.8,0.2)){
-    phys_Body <-  as.matrix(data.frame('x'=(((c(4,4,4.2,4))+i-5.8)*scaling),
-                                       
-                                       'y'=(c(5,4,3.6,5)+0.2-6)*scaling)) |>
-      list()|>
-      st_polygon() |>
-      st_union(phys_Body)
-  }
-  
-  phys_Body[[1]][,1] <- phys_Body[[1]][,1] + center[1]
-  phys_Body[[1]][,2] <- phys_Body[[1]][,2] + center[2]
-  
-  plot(phys_Body, col = 'blue', add =T)
-}
 
 # Movement of Physalia
 physaliaMovement <- function(physalia, glaucus){
   
   # Boundary conditions for movement, i.e. out of frame
-  if(physalia$y >= 100 | physalia$y <= 1){ 
+  if(physalia$y >= 100 | physalia$y <= 1 |physalia$x >= 10 ){ 
     return(physalia)}
   
   
@@ -75,20 +34,20 @@ physaliaMovement <- function(physalia, glaucus){
     # physalia also have an offset - their sails change the way they interact
     # with wind - this is one of the cool parts in the model.
     # 0.0266 - see Lee, Schaeffer, Groeskamp (2021)
-    physalia$x <- max(physalia$x + 0.0266*(wind_strength[round(physalia$y,digits = 2), 
-                                                         round(physalia$x, digits = 2)]) * sin(wind_direction[round(physalia$y,digits = 2), 
-                                                                                                              round(physalia$x, digits = 2)]+ direction_offset) +
-                        0.001* current_strength[round(physalia$y,digits = 2), 
-                                                round(physalia$x, digits = 2)] * sin(current_direction[round(physalia$y,digits = 2), 
-                                                                                                       round(physalia$x, digits = 2)]),0)
+    physalia$x <- max(physalia$x + 0.0266*(wind_strength[round(physalia$y,digits = 0), 
+                                                         round(physalia$x, digits = 0)]) * sin(wind_direction[round(physalia$y,digits = 0), 
+                                                                                                              round(physalia$x, digits = 0)]+ direction_offset) +
+                        0.001* current_strength[round(physalia$y,digits = 0), 
+                                                round(physalia$x, digits = 0)] * sin(current_direction[round(physalia$y,digits = 0), 
+                                                                                                       round(physalia$x, digits = 0)]),0)
     
     # Y movement (north - south) uses cosine function
-    physalia$y <- max(physalia$y + 0.0266*(wind_strength[round(physalia$y,digits = 2), 
-                                                         round(physalia$x, digits = 2)]) * cos(wind_direction[round(physalia$y,digits = 2), 
-                                                                                                              round(physalia$x, digits = 2)] + direction_offset) +
-                        0.001* current_strength[round(physalia$y,digits = 2), 
-                                                round(physalia$x, digits = 2)] * cos(current_direction[round(physalia$y,digits = 2), 
-                                                                                                       round(physalia$x, digits = 2)]),0)
+    physalia$y <- max(physalia$y + 0.0266*(wind_strength[round(physalia$y,digits = 0), 
+                                                         round(physalia$x, digits = 0)]) * cos(wind_direction[round(physalia$y,digits = 0), 
+                                                                                                              round(physalia$x, digits = 0)] + direction_offset) +
+                        0.001* current_strength[round(physalia$y,digits = 0), 
+                                                round(physalia$x, digits = 0)] * cos(current_direction[round(physalia$y,digits = 0), 
+                                                                                                       round(physalia$x, digits = 0)]),0)
     
     ### Predator module
     
@@ -129,7 +88,7 @@ physaliaMovement <- function(physalia, glaucus){
 # Movement of Glaucus with extra interaction
 glaucusMovement <- function(glaucus, physalia){
   # Boundary conditions for movement, i.e. out of frame
-  if(glaucus$y >= 100 | glaucus$y <= 1){ 
+  if(glaucus$y >= 100 | glaucus$y <= 1 | glaucus$x >= 10){ 
     return(glaucus)}
   
   # First check if glaucus are 'latched on' to physalia which will 
@@ -138,12 +97,12 @@ glaucusMovement <- function(glaucus, physalia){
     glaucus$x <- physalia[glaucus$target_ID,'x']
     glaucus$y <- physalia[glaucus$target_ID,'y']
     glaucus$latch_time <- glaucus$latch_time + 1
-    
+    glaucus$total_latch_time <- glaucus$total_latch_time + 1
     # Probability of glaucus detaching follows a beta prime distribution.
     # Shape of distribtution set to match expected behaviour.
     probs <- c(1-pbetapr(glaucus$latch_time, 24, 5), pbetapr(glaucus$latch_time, 24, 5))
     glaucus$target_ID <- sample(size=1, x = c(glaucus$target_ID, NA), prob = probs) # NA corresponds to letting go.
-    
+  
   }else{
     
     
@@ -156,20 +115,20 @@ glaucusMovement <- function(glaucus, physalia){
       # Now account for effect of current and wind on glaucus.  
       
       # Positional update rules: this IS the movement of a Glaucus
-      glaucus$x <- max(glaucus$x + 0.001*wind_strength[round(glaucus$y,digits = 2), 
-                                                       round(glaucus$x, digits = 2)] * sin(wind_direction[round(glaucus$y,digits = 2), 
-                                                                                                          round(glaucus$x, digits = 2)]) +
-                         0.001 *current_strength[round(glaucus$y,digits = 2), 
-                                                 round(glaucus$x, digits = 2)] * sin(current_direction[round(glaucus$y,digits = 2), 
-                                                                                                       round(glaucus$x, digits = 2)]),0)
+      glaucus$x <- max(glaucus$x + 0.001*wind_strength[round(glaucus$y,digits = 0), 
+                                                       round(glaucus$x, digits = 0)] * sin(wind_direction[round(glaucus$y,digits = 0), 
+                                                                                                          round(glaucus$x, digits = 0)])+
+                         0.001 *current_strength[round(glaucus$y,digits = 0), 
+                                                 round(glaucus$x, digits = 0)] * sin(current_direction[round(glaucus$y,digits = 0), 
+                                                                                                       round(glaucus$x, digits = 0)]),0)
       
       # Y movement (north - south) uses cosine function
-      glaucus$y <- max(glaucus$y + 0.001*wind_strength[round(glaucus$y,digits = 2), 
-                                                       round(glaucus$x, digits = 2)] * cos(wind_direction[round(glaucus$y,digits = 2), 
-                                                                                                          round(glaucus$x, digits = 2)]) +
-                         0.001 * current_strength[round(glaucus$y,digits = 2), 
-                                                  round(glaucus$x, digits = 2)] * cos(current_direction[round(glaucus$y,digits = 2), 
-                                                                                                        round(glaucus$x, digits = 2)]),0)
+      glaucus$y <- max(glaucus$y + 0.001*wind_strength[round(glaucus$y,digits = 0), 
+                                                       round(glaucus$x, digits = 0)] * cos(wind_direction[round(glaucus$y,digits = 0), 
+                                                                                                          round(glaucus$x, digits = 0)]) +
+                         0.001 * current_strength[round(glaucus$y,digits = 0), 
+                                                  round(glaucus$x, digits = 0)] * cos(current_direction[round(glaucus$y,digits = 0), 
+                                                                                                        round(glaucus$x, digits = 0)]),0)
       
       ### Predator module
       
@@ -205,7 +164,7 @@ glaucusMovement <- function(glaucus, physalia){
         eating.zone <- st_buffer(spat.point, 0.0005) # 0.5 meters is our spatial resolution
         if(any(st_intersects(physalia.df.spat, eating.zone, sparse = F))){
           # Identify the prey to latch on to
-          glaucus$target_ID = which(st_intersects(physalia.df.spat, eating.zone, sparse = F) == T)
+          glaucus$target_ID = which(st_intersects(physalia.df.spat, eating.zone, sparse = F) == T)[1] # problem, which min, gives double..
           glaucus$latch_time = 1
           
         }
@@ -253,7 +212,7 @@ simBlueFleet <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
   # powered movement. 
   
   glaucus <- data.frame(matrix(nrow=nGlaucus, ncol=8))
-  colnames(glaucus) <- c("ID", "x", "y", "chemodetection", "speed", "latch_time", "target_ID", "status")
+  colnames(glaucus) <- c("ID", "x", "y", "chemodetection", "speed", "latch_time","total_latch_time", "target_ID", "status")
   for (i in 1:nGlaucus) {
     glaucus[i,] <- list(
       ID = i,
@@ -262,6 +221,7 @@ simBlueFleet <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
       chemodetection = glaucus_Chemodetection, 
       speed = rnorm(1,glaucus_Speed, sd = glaucus_Speed/4),
       latch_time = 0,
+      total_latch_time = 0,
       target_ID = NA,
       status = 'ALIVE'
     )
@@ -321,21 +281,21 @@ simBlueFleet <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
 # throughout the ocean, they should be relatively close
 # together to start. We can then see how they diverge.
 
-iniSpace <- list(xmin = 8.5,
-                 xmax = 9,
-                 ymin = 5,
-                 ymax = 5.5)
+iniSpace <- list(xmin = 7.5,
+                 xmax = 8,
+                 ymin = 50,
+                 ymax = 55)
 
 # Grid spatial extent, each unit represents a kilometer
-n_rows <- 10
+n_rows <- 100
 n_cols <- 10
 
 # Number of simulation iterations
 nTimes = 1000
 
 # Number of Glaucus and Pysalia individuals
-nPhysalia = 1000
-nGlaucus = 500
+nPhysalia = 1
+nGlaucus = 1
 
 # Direction parameters fixed
 dir_wind = (45*pi)/180
@@ -361,10 +321,10 @@ glaucus_Speed <- 0.00015
 # How likely are interactions between glaucus and physalia for different densities? (What to do with wind)
 # Is glaucus just as likely to strand, given wind should affect it less?
 
-
+# Will probably need to cut this down.
 # Max strandings over parameter space
-wind_strength_range <- seq(0,50,0.1)
-current_strength_range <- seq(0,25,0.1)
+wind_strength_range <- seq(0,50,1)
+current_strength_range <- seq(0,10,1)
 
 max_strandings <- data.frame('strength_wind' = vector(mode='numeric', length(current_strength_range) * length(wind_strength_range)),
                              'direction_wind' = vector(mode='numeric',length(current_strength_range) * length(wind_strength_range)),
@@ -376,13 +336,14 @@ max_strandings <- data.frame('strength_wind' = vector(mode='numeric', length(cur
 df_row = 0
 for(strength_wind in wind_strength_range){
   for(strength_current in current_strength_range){
-    print(strength_wind)
+    print(paste0('wind strength = ', strength_wind))
+    print(paste0('current strength = ',strength_current))
     df_row = df_row + 1
     BFS<-simBlueFleet(nTimes=nTimes, n_rows = n_rows, n_cols = n_cols, nPhysalia = nPhysalia, nGlaucus = nGlaucus,
                       strength_current = strength_current, strength_wind = strength_wind,
                       dir_wind = dir_wind, dir_current = dir_current, glaucus_Chemodetection = glaucus_Chemodetection,
                       glaucus_Speed = glaucus_Speed, iniSpace = iniSpace)
-
+    
     beached.glaucus <- sum(BFS$GlaucusSim[[length(BFS$GlaucusSim)]]$status == 'BEACHED') / nrow(BFS$GlaucusSim[[length(BFS$GlaucusSim)]])
     beached.phys.left <- sum(subset(BFS$PhysaliaSim[[length(BFS$PhysaliaSim)]], orientation == 'left')$status == 'BEACHED') / nrow(subset(BFS$PhysaliaSim[[length(BFS$PhysaliaSim)]], orientation == 'left'))
     beached.phys.right <- sum(subset(BFS$PhysaliaSim[[length(BFS$PhysaliaSim)]], orientation == 'right')$status == 'BEACHED') / nrow(subset(BFS$PhysaliaSim[[length(BFS$PhysaliaSim)]], orientation == 'right'))
@@ -394,7 +355,9 @@ for(strength_wind in wind_strength_range){
                                  beached.glaucus,
                                  beached.phys.right,
                                  beached.phys.left)
+    
   }
+  
 }
 
 # Return output
