@@ -364,10 +364,10 @@ LHS$density <- density
 # throughout the ocean, they should be relatively close
 # together to start. We can then see how they diverge.
 
-iniSpace <- list(xmin = 5,
+iniSpace <- list(xmin = 7,
                  xmax = 8,
-                 ymin = 35,
-                 ymax = 60)
+                 ymin = 45,
+                 ymax = 50)
 
 # Grid spatial extent, each unit represents a kilometer
 n_rows <- 100

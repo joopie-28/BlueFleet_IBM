@@ -518,10 +518,10 @@ if (length(args) < 1) { # no arguments provided
 # throughout the ocean, they should be relatively close
 # together to start. We can then see how they diverge.
 
-iniSpace <- list(xmin = 5,
+iniSpace <- list(xmin = 7,
                  xmax = 8,
-                 ymin = 35,
-                 ymax = 60)
+                 ymin = 45,
+                 ymax = 50)
 
 # Grid spatial extent, each unit represents a kilometer
 n_rows <- 100
@@ -621,10 +621,10 @@ LHS$density <- density
 # throughout the ocean, they should be relatively close
 # together to start. We can then see how they diverge.
 
-iniSpace <- list(xmin = 5,
+iniSpace <- list(xmin = 7,
                  xmax = 8,
-                 ymin = 40,
-                 ymax = 41)
+                 ymin = 45,
+                 ymax = 50)
 
 # Grid spatial extent, each unit represents a kilometer
 n_rows <- 100
@@ -1147,10 +1147,10 @@ simBlueFleet.stochPhys <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
 # throughout the ocean, they should be relatively close
 # together to start. We can then see how they diverge.
 
-iniSpace <- list(xmin = 5,
+iniSpace <- list(xmin = 7,
                  xmax = 8,
-                 ymin = 35,
-                 ymax = 60)
+                 ymin = 45,
+                 ymax = 50)
 
 # Grid spatial extent, each unit represents a kilometer
 n_rows <- 100
@@ -1577,10 +1577,10 @@ LHS$density <- density
 # throughout the ocean, they should be relatively close
 # together to start. We can then see how they diverge.
 
-iniSpace <- list(xmin = 5,
+iniSpace <- list(xmin = 7,
                  xmax = 8,
-                 ymin = 35,
-                 ymax = 60)
+                 ymin = 45,
+                 ymax = 50)
 
 # Grid spatial extent, each unit represents a kilometer
 n_rows <- 100
