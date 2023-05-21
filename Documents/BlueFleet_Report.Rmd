@@ -33,15 +33,15 @@ library(tidyverse)
 # 1. Introduction
 
 <p align="justify">
-The blue fleet refers to a community of neustonic (i.e. drifting or floating with winds and currents) organisms, with a cosmopolitan distribution (Bourg *et al*., 2022). The community consists of several species of Cnidaria (Jellyfish and relatives) as well as a variety of Molluscs (Helm, 2021). Aggregations of these organisms may cover extremely large areas, sometimes spanning several kilometers. Whilst large fleets are generally confined to offshore areas, such as oceanic gyres, strong onshore winds and currents can cause mass strandings of these creatures (Bourg *et al*., 2022). This poses a risk to swimmers and beachgoers, as several constituent species possess the ability to envenomate people or animals upon touch (e.g. the Bluebottle). The exact dynamics driving stranding of harmful species are not completely understood, however this is an area of active research (e.g. Bourg *et al*., 2022; Lee *et al*., 2021). Interestingly, there is some variability in the number of species that one might find during a mass stranding event: sometimes we see all species strand, whilst at other times only one species may be recorded (Grove, 2010). This could be explained by the inherent morphological differences between the species that make up the blue fleet. For example, several cnidarians, including the bluebottle and the by-the-wind sailor (*Vellela vellela*), have evolved an enlarged membrane filled with gas that serves as a sail. Individual bluebottles come in a right or left-sailed orientation: these two morphotypes will drift in opposite directions from each other (Bourg *et al*., 2022; Lee *et al*., 2021). Other functional groups, such as the pelagic slugs that prey on the floating cnidarians, lack such structures. Thus, whilst all these species are considered part of the blue fleet, physical forces might affect them in different ways.
+The blue fleet refers to a community of neustonic (i.e. drifting or floating with winds and currents) marine organisms, with a cosmopolitan distribution (Bourg *et al*., 2022). The community consists of several species of Cnidarians as well as a variety of Molluscs (Helm, 2021). Aggregations of these organisms may cover extremely large areas, sometimes spanning several kilometers. Whilst large fleets are generally confined to offshore areas, such as oceanic gyres, strong onshore winds and currents can cause mass strandings of these creatures (Bourg *et al*., 2022). This poses a risk to swimmers and beachgoers, as several constituent species possess the ability to envenomate people or animals upon touch (e.g. the Bluebottle). The exact dynamics driving stranding of harmful species are not completely understood, however this is an area of active research (e.g. Bourg *et al*., 2022; Lee *et al*., 2021). Interestingly, there is some variability in the number of species that one might find during a mass stranding event: sometimes we see all species strand, whilst at other times only one species may be recorded (Grove, 2010). This could be explained by the inherent morphological differences between the species that make up the blue fleet. For example, several cnidarians, including the bluebottle (*Physalia physalis*) and the by-the-wind sailor (*Vellela vellela*), have evolved an enlarged membrane filled with gas that serves as a rudimentary sail (Lee *et al*., 2021). Individual bluebottles come in a right or left-sailed orientation: these two morphotypes will drift in opposite directions from each other (Bourg *et al*., 2022; Lee *et al*., 2021). Other functional groups, such as the pelagic slugs that prey on the floating cnidarians, lack such structures. Thus, whilst all these species are considered part of the blue fleet, physical forces might affect them in different ways.
 </p>
 <p align="justify">
-Here, we simulate the drifting dynamics of two species that are part of the blue fleet: The bluebottle *Physalia physalis* (Cnidaria: Siphonophora) and The 'Blue Dragon' *Glaucus atlanticus* (Gastropoda: Nudibranchia), a pelagic sea slug and a predator of *P. physalis*. Drifting behaviour, and associated beaching probabilities for each species were investigated through the use of an Individual Based Model (IBM). We incorporate meaningful ecological interactions between the two species, such as predation, to promote realism of the drifting dynamics. Not much is known about how Blue Dragons find their prey. However, it is possible that they are capable of very limited directed movement, as well as chemodetection of nearby prey using specialised structures known as rhinophores (Valdes & Compillo, 2004). Helm (2021) found that different species of pelagic slugs had distinct unique predatory preferences and behaviours when exposed to prey in a laboratory environment. Alternatively, prey density might be so high that Blue Dragons simply rely on chance encounters with prey. By simulating this system with different combinations of prey densities and biological parameters, we aim to generate insights into how a small neustonic predator finds prey. 
+Here, we simulate the drifting dynamics of two species that are part of the blue fleet: The bluebottle *Physalia physalis* (Cnidaria: Siphonophora) and The 'Blue Dragon' *Glaucus atlanticus* (Gastropoda: Nudibranchia), a pelagic sea slug and a predator of *P. physalis*. Drifting behaviour, and associated beaching probabilities for each species were investigated through the use of an Individual Based Model (IBM). We incorporate meaningful ecological interactions between the two species, such as predation, to promote realism of the drifting dynamics. Not much is known about how Blue Dragons find their prey. However, it is possible that they are capable of very limited directed movement, as well as chemodetection of nearby prey using specialised structures known as rhinophores (Valdes & Compillo, 2004). Helm (2021) found that different species of pelagic slugs displayed distinct predatory preferences and behaviour when exposed to prey in a laboratory environment. Alternatively, prey density might be so high that Blue Dragons simply rely on chance encounters with prey. By simulating this system with different combinations of prey densities and biological parameters, we aim to generate insights into how a small neustonic predator finds prey. 
 </p>
 <p align="justify">
 We thus strive to answer the following questions:
 
-1. *How do beaching probabilities differ between the two species?*
+1. *How do beaching probabilities differ between Glaucus atlanticus and Physalia physalis?*
 
 2. *How do prey density, swimming speed and chemodetection affect the number of predator-prey interactions?*
 </p>
@@ -56,7 +56,7 @@ The model is designed to investigate the effects of physical factors such as win
 The environment was then populated with individual *G. atlanticus* and *P. physalis*, each with their own unique attributes. For *G. atlanticus*, we assigned the following attributes: initial X coordinate, initial Y coordinate, chemodetection range, and movement speed. As both chemodetection and speed are traits that are expected to vary between *G. atlanticus*, these were assigned by drawing from a normal distribution with mean = 1 meter and sd = 0.25 meter for chemodetection and mean = 0.15 cm/H and sd = 3.75 (proportion of sd to mean was unchanged for simulations in which speed and chemodetection were varied). There was no prior information available for these values, so they are largely based on assumptions. Individual *G. atlanticus* could end up beached or alive at the end of the simulation. For *P. physalis*, the following attributes were assigned: initial X coordinate, initial Y coordinate and orientation. Orientation refers to the position of the sail relative to the tentacles: this comes in a 'right-handed' or 'left-handed' variation. This variable was assigned randomly for each individual. Individual *P. physalis* could end up beached, eaten, or alive at the end of the simulation.
 </p>
 <p align="justify">
-Whilst the grid resolution was 1km, our model allows individuals to move through continuous space. The movement of an individual depends on the winds and current within the current cell, however the effect of these drivers might only amount to a movement of 20 cm within a timestep. This value is used to update the position of the individual. On the next iteration, the individual will simply 'feel' the same physical drivers, as it still finds itself in the same cell. Thus, movement is decoupled from grid cells, but the effect of wind and currents on the position of an individual does depend on the grid cell they are in. This enables us to include the biological interactions that occur on the scale of centimeters.
+Whilst the grid resolution was 1km, our model allows individuals to move through continuous space. The movement of an individual depends on the winds and current within the current cell. However the effect of these drivers might only amount to a movement of, for example, 20 cm within a timestep. This value is used to update the position of the individual. On the next iteration, the individual will simply 'feel' the same physical drivers, as it still finds itself in the same cell. Thus, movement is decoupled from grid cells, but the effect of wind and currents on the position of an individual does depend on the grid cell they are in. This enables us to include the biological interactions that occur on the scale of centimeters.
 </p>
 
 * ***Note: I initially opted for a grid approach as I was thinking about assigning distinct directions and speeds to different parts of the simulated environment. I did not end up doing this, so the grid structure is not really necessary, however I left it in as it makes no difference and allows me to maybe make those changes in a future version.***
@@ -67,10 +67,10 @@ Whilst the grid resolution was 1km, our model allows individuals to move through
 
 ### 2.2.1 Glaucus atlanticus
 $$
-X_{j,i+1} = X_{ij} + 0.01 * WindSpeed_{{xy,i}} sin(WindDirection_{xy,i}) + 0.005 * CurrentSpeed_{xy,i} * sin(CurrentDirection_{xy,i}) + C * (GlaucusSpeed_{ij} * sin(atan(Y_{Prey} - Y_i, X_{Prey} - X_i)))
+X_{j,i+1} = X_{ij} + 0.01 * WindSpeed_{{xy,i}} sin(WindDirection_{xy,i}) + 0.005 * CurrentSpeed_{xy,i} * sin(CurrentDirection_{xy,i}) + C * (GlaucusSpeed_{i} * sin(atan(Y_{Prey} - Y_i, X_{Prey} - X_i)))
 $$
 $$
-Y_{j,i+1} = Y_{ij} + 0.01 * WindSpeed_{{xy,i}} * cos(WindDirection_{xy,i}) + 0.005 * CurrentSpeed_{xy,i} * cos(CurrentDirection_{xy,i}) + C * (GlaucusSpeed_{ij} * cos(atan(Y_{Prey} - Y_{ij}, X_{Prey} - X_{ij} )) )
+Y_{j,i+1} = Y_{ij} + 0.01 * WindSpeed_{{xy,i}} * cos(WindDirection_{xy,i}) + 0.005 * CurrentSpeed_{xy,i} * cos(CurrentDirection_{xy,i}) + C * (GlaucusSpeed_{i} * cos(atan(Y_{Prey} - Y_{ij}, X_{Prey} - X_{ij} )) )
 $$
 ***Where:*** 
 
@@ -79,28 +79,29 @@ X_{j,i+1} = \text{Position}\,\text{along}\,\text{the}\,\text{East-West}\,\text{A
 X_{ij} = \text{Position}\,\text{along}\,\text{the}\,\text{East-West}\,\text{Axis for}\,Individual_{j }\text{ at}\,\text{Time = }\,i \\
 Y_{j,i+1} = \text{Position}\,\text{along}\,\text{the}\,\text{North-South}\,\text{Axis for}\,Individual_{j }\text{ at}\,\text{Time = }\,i+1 \\
 Y_{ij} = \text{Position}\,\text{along}\,\text{the}\,\text{North-South}\,\text{Axis for}\,Individual_{j }\text{ at}\,\text{Time = }\,i \\
-WindSpeed_{xy,i} = \text{Wind Speed}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
-WindDirection_{xy,i} = \text{Wind Direction}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
-CurrentSpeed_{xy,i} = \text{Current Speed}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
-CurrentDirection_{xy,i} = \text{Current Direction}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
-GlaucusSpeed_{i,j} = \text{Swimming Speed}\,\text{for}\, Individual_{j }\text{ at}\,\text{Time = }\,i \\
+WindSpeed_{xy,i} = \text{Wind Speed}\,\text{in}\, cell_{X,Y},\text{at}\,\text{Time = }\,i \\
+WindDirection_{xy,i} = \text{Wind Direction}\,\text{in}\, cell_{X,Y},\text{at}\,\text{Time = }\,i \\
+CurrentSpeed_{xy,i} = \text{Current Speed}\,\text{in}\, cell_{X,Y},\text{at}\,\text{Time = }\,i \\
+CurrentDirection_{xy,i} = \text{Current Direction}\,\text{in}\, cell_{X,Y},\text{at}\,\text{Time = }\,i \\
+GlaucusSpeed_{j} = \text{Swimming Speed}\,\text{for}\, Individual_{j } \\
 Y_{prey} = \text{Y coordinate of closest prey for}\, Individual_{j } \text{ at Time = } i \\
 X_{prey} = \text{X coordinate of closest prey for}\, Individual_{j } \text{ at Time = } i \\
 Prey = ∀Physalia \\
 C = \begin{cases}
 1, & \text{if Prey within } Detection Range_j \\
-0, & \text{if Prey beyond } Detection Range_j
-\end{cases}
+0, & \text{if Prey beyond } Detection Range_j 
+\end{cases} \\
+DetectionRange_{j} = \text{Detection range}\,\text{for}\, Individual_{j } \\
 $$
 
 <p align="justify">
-The movement of *G. atlanticus*s depends on physical and biological parameters. For iteration i of the model, the position of an individual is given by the x and y coordinate. The displacement between time = i and time = i + 1 is given by above equations. The effects of winds and current depend on i) the speed in km/h and ii) the direction in radians. Sin(direction) then gives vertical (north-south) displacement, whilst cos(direction) gives horizontal (east-west). To illustrate, if wind is blowing from the east, direction equals 1.5 * pi. Displacement can then be calculated as:
+The movement of *G. atlanticus* depends on physical and biological parameters. For iteration *i* of the model, the position of an individual is given by the x and y coordinate. The displacement between time = i and time = i + 1 is given by above equations. The effects of winds and current depend on i) the speed in km/h and ii) the direction in radians. Sin(direction) then gives vertical (north-south) displacement, whilst cos(direction) gives horizontal (east-west). We assume that wind pushes an individual animal at 1% of wind speed and current at 0.5% current speed. To illustrate, if wind is blowing from the east, direction equals 1.5 * pi. Displacement can then be calculated as:
 </p>
 
 $$
 \Delta_{x} = sin(1.5 * pi) * speed = -1*speed \\
-\Delta_{y} = cos(1.5*pi) = 0 \\
-\text{Thus, wind from the east will move an individual to the west}
+\Delta_{y} = cos(1.5*pi) * speed = 0*speed = 0 \\
+\text{Thus, wind from the east will move an individual to the west at a non-zero speed}
 $$
 
 <p align="justify">
@@ -226,18 +227,18 @@ X_{j,i+1} = \text{Position}\,\text{along}\,\text{the}\,\text{East-West}\,\text{A
 X_{ij} = \text{Position}\,\text{along}\,\text{the}\,\text{East-West}\,\text{Axis for}\,Individual_{j }\text{ at}\,\text{Time = }\,i \\
 Y_{j,i+1} = \text{Position}\,\text{along}\,\text{the}\,\text{North-South}\,\text{Axis for}\,Individual_{j }\text{ at}\,\text{Time = }\,i+1 \\
 Y_{ij} = \text{Position}\,\text{along}\,\text{the}\,\text{North-South}\,\text{Axis for}\,Individual_{j }\text{ at}\,\text{Time = }\,i \\
-WindSpeed_{xy,i} = \text{Wind Speed}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
-WindDirection_{xy,i} = \text{Wind Direction}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
-CurrentSpeed_{xy,i} = \text{Current Speed}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
-CurrentDirection_{xy,i} = \text{Current Direction}\,\text{in}\, cell_{X_i,Y_i},\text{at}\,\text{Time = }\,i \\
+WindSpeed_{xy,i} = \text{Wind Speed}\,\text{in}\, cell_{X,Y},\text{at}\,\text{Time = }\,i \\
+WindDirection_{xy,i} = \text{Wind Direction}\,\text{in}\, cell_{X,Y},\text{at}\,\text{Time = }\,i \\
+CurrentSpeed_{xy,i} = \text{Current Speed}\,\text{in}\, cell_{X,Y},\text{at}\,\text{Time = }\,i \\
+CurrentDirection_{xy,i} = \text{Current Direction}\,\text{in}\, cell_{X,Y},\text{at}\,\text{Time = }\,i \\
 D_{ij} = \begin{cases}
 normal(pi/3, 0.25) & \text{if Orientation}_j = Right \\
 normal(-pi/3,0.25) & \text{if Orientation}_j = Left
 \end{cases} \text{at Time = } i \\
-Orientation_j = \text{Sail Orientation of Individual}_j \text{ at Time = } i
+Orientation_j = \text{Sail Orientation of Individual}_j 
 $$
 
-*P. physalis* moves at ~2.66% the speed of the wind (Lee *et al*., 2021). Left-sailed individuals will be pushed in a direction 50 degrees to the left of the prevailing wind, whilst right handed individuals move 50 degrees to the right of prevailing winds (Bourg *et al*., 2022). The effect of currents on *P. physalis* is then described using similar equations as for Glaucus.
+*P. physalis* moves at ~2.66% the speed of the wind (Lee *et al*., 2021). Left-sailed individuals will be pushed in a direction 50 degrees to the left of the prevailing wind, whilst right handed individuals move 50 degrees to the right of prevailing winds (Bourg *et al*., 2022). The effect of currents on *P. physalis* is then described using similar equations as for Glaucus. We assume that current has a smaller effect on *P. physalis*, as the portion of the body that is under water consists mainly of tentacles with little drag (Lee *et al*., 2021). Current thus moves *P. physalis* at 0.1% of current speed.
 ```{r PP Movement, eval=F, include=TRUE}
 
 # Movement of Physalia
@@ -325,7 +326,7 @@ physaliaMovement <- function(physalia, glaucus){
 
 ### 2.3 Biological Interactions
 <p align="justify">
-Both species are able to interact with each other in the model, and this potentially affects their movements. *G. atlanticus* will seek out nearby *P. physalis* as described in section 2.2.1. However, they may also 'latch' on to a *P. physalis*. This emulates feeding behaviour in which *G. atlanticus* move within the tentacles of a *P. physalis*: *G. atlanticus* may then move with the *P. physalis*, until it stops feeding or completely depletes the resource. Consequently, the time it takes to deplete the resource equals the time it takes for a *P. physalis* to be killed. We assume that an individual *P. physalis* cannot survive unlimited attacks by *G. atlanticus*, and thus an individual that spends more than 24 hours 'under attack' will be assigned the status 'EATEN' and no further movements are simulated. Any *G. atlanticus* that was 'latched on' to the deceased prey, or one that simply stops feeding, then reverts to their regular movement equations. Individual *G. atlanticus* may also detach from prey before consuming it. We model detachment using a beta prime distribution (α = 24, β = 5), by letting the probability of detaching equal the probability of observing a given latch time from the specified beta prime distribution. 
+Both species are able to interact with each other in the model, and this potentially affects their movements. *G. atlanticus* will seek out nearby *P. physalis* as described in section 2.2.1. However, they may also 'latch' on to a *P. physalis*. This emulates feeding behaviour in which *G. atlanticus* move within the tentacles of a *P. physalis*: *G. atlanticus* may then move with the *P. physalis*, until it stops feeding or completely depletes the resource. Consequently, the time it takes to deplete the resource equals the time it takes for a *P. physalis* to be killed. We assume that an individual *P. physalis* cannot survive unlimited attacks by *G. atlanticus*, and thus an individual that spends more than 24 hours 'under attack' will be assigned the status 'EATEN' and no further movements are simulated. Any *G. atlanticus* that was 'latched on' to the deceased prey, then reverts to their regular movement equations. Individual *G. atlanticus* may also detach from prey before consuming it. We model detachment using a beta prime distribution (α = 24, β = 5), by letting the probability of detaching equal the probability of observing a given latch time from the specified beta prime distribution. 
 </p>
 ```{r Latch on equations, eval=F, include=TRUE}
 
@@ -334,7 +335,7 @@ Both species are able to interact with each other in the model, and this potenti
 ### 2.4 Stochasticity of Winds and Currents
 
 <p align="justify">
-We strived to emulate the wind and current regime of the East Australian coastline. The primary current is the EAC, which flows in a southward direction. The current speed was initialized at a  5 km/H; this was deemed reasonable as the top speed of the EAC is thought to be around 7 km/H (XXX). We then allowed speeds to increase or decrease stochastically, within a range of 2 km/H - 7 km/H. Wind and current direction were initialized at 315° and 180° and allowed to vary: wind direction varies between 225° and 315°, whilst current direction varies between 160° and 200°. This approach directions did not 'jump' randomly, but instead changed due to small stochastic increases or decreases. These ranges were based on available data (WillyWeather, 2023; Middleton *et al*., 1996). 
+We strived to emulate the wind and current regime of the East Australian coastline. The primary current is the EAC, which flows in a southward direction. The current speed was initialized at a  5 km/H; this was deemed reasonable as the top speed of the EAC is  around 7 km/H (Middleton *et al*., 1996). We then allowed speeds to increase or decrease stochastically, within a range of 2 km/H - 7 km/H. Wind and current direction were initialized at 315° and 180° and allowed to vary: wind direction varies between 225° and 315°, whilst current direction varies between 160° and 200°. This approach directions did not 'jump' randomly, but instead changed due to small stochastic increases or decreases. These ranges were based on available data (WillyWeather, 2023; Middleton *et al*., 1996). 
 </p>
 <p align="justify">
 Wind speed was modeled following a slightly different approach. Wind speed generally follows a daily cycle, in which wind builds up throughout the day. We simulated this using a sine function with added gaussian noise - this function is featured in the following code chunk.
@@ -347,7 +348,7 @@ wind_strength_calc <-function(hour) {
   amplitude <- 5       # Amplitude of the sinusoidal function (half of the variation)
   
   
-  # Calculate daylight hours using a sinusoidal function
+  # Calculate speed using a sine
   strength = amplitude * sin((hour - peak_hour) * 2 * pi / 24) + 10 
   strength = (strength + rnorm(length(hour), 0, sd = 3))
   strength[which(strength<0)] <- 0
@@ -363,7 +364,19 @@ In order to effectively answer our research questions, we designed a simulation 
 </p>
 ## 3.1 Simulation Function
 <p align="justify">
-We created a main simulation function that handles creation of the environment, instantiation of agents, and movement updates based on a fixed number of hours or iterations. The function takes 10 parameters to achieve this.
+We created a main simulation function that handles creation of the environment, instantiation of agents, and movement updates based on a fixed number of hours or iterations. The function takes 11 parameters to achieve this.
+
+- **iniSpace**: A vector of 4 coordinates denoting a bounding box of where on the gridyou wish to initialise agents. 
+- **nTimes**: Number of simulation iterations. 
+- **n_rows**: Height of grid (km) 
+- **n_cols**: Width of grid (km)
+- **nPhysalia**: Number of *P. physalis*
+- **nGlaucus**: Number of *G. atlanticus*
+- **strength_current**: Inital current speed (km/h)
+- **dir_current**: Initial current direction 
+- **dir_wind**: Initial wind direction 
+- **Glaucus_chemodetection**: mean chemodetection range for *G. atlanticus* population.
+- **Glaucus_speed**: mean swimming speed for *G. atlanticus* population.
 </p>
 ```{r FullSim, eval=F, include=TRUE}
 
@@ -505,8 +518,8 @@ if (length(args) < 1) { # no arguments provided
 # throughout the ocean, they should be relatively close
 # together to start. We can then see how they diverge.
 
-iniSpace <- list(xmin = 1.1,
-                 xmax = 1.11,
+iniSpace <- list(xmin = 5,
+                 xmax = 8,
                  ymin = 35,
                  ymax = 60)
 
@@ -608,8 +621,8 @@ LHS$density <- density
 # throughout the ocean, they should be relatively close
 # together to start. We can then see how they diverge.
 
-iniSpace <- list(xmin = 8,
-                 xmax = 9,
+iniSpace <- list(xmin = 5,
+                 xmax = 8,
                  ymin = 40,
                  ymax = 41)
 
@@ -691,12 +704,14 @@ for(i in 1:32){
 
 plot(simOutput_list[[1]]$beached_glaucus, type = 'n',
      xlab = 'Time (Hours)', ylab = 'Proportion of Beached Glaucus', xlim=c(0,300),ylim=c(0,1))
+mtext("a)",side = 3, adj = 0, line = 0)
 for(i in 1:32){
  lines(simOutput_list[[i]]$beached_glaucus, col=alpha('steelblue',0.3), lwd = 2)
 }
 
 plot(simOutput_list[[1]]$beached.phys.left, type = 'n',ylim=c(0,1),
      xlab = 'Time (Hours)', ylab = 'Proportion of Beached Physalia', xlim=c(0,500))
+mtext("b)",side = 3, adj = 0, line = 0)
 for(i in 1:32){
   lines(simOutput_list[[i]]$beached.phys.left, col=alpha('purple',0.8), lwd = 2)
   lines(simOutput_list[[i]]$beached.phys.right, col=alpha('blue',0.5), lwd = 2)
@@ -726,6 +741,7 @@ for(i in 1:3){
 
 plot(interactionPerInd~chemoM,data = huntOutput_list[[3]], pch=19, type = 'n',
      ylab= "Interactions per Individual", xlab = 'Chemodetection Range (m)')
+mtext("a)",side = 3, adj = 0, line = 0)
 cols <- c('blue', 'red', 'green')
 for(i in 1:3){
  points(interactionPerInd~chemoM,data = huntOutput_list[[i]], bg = cols[i], pch=21, col='black')
@@ -736,6 +752,7 @@ legend('topleft',title = 'Prey Density' ,legend = c('1x','3x', '5x'),cex=0.55, p
 
 plot(interactionPerInd~speedM,data = huntOutput_list[[3]], pch=19, type = 'n',
      ylab= "Interactions per Individual", xlab = 'Swimming Speed (m)')
+mtext("b)",side = 3, adj = 0, line = 0)
 cols <- c('blue', 'red', 'green')
 for(i in 1:3){
   points(interactionPerInd~speedM,data = huntOutput_list[[i]], bg = cols[i], pch=21, col='black')
@@ -750,13 +767,13 @@ legend('topleft',title = 'Prey Density' ,legend = c('1x','3x', '5x'),cex=0.55, p
 ## 5.1 The Blue Fleet: a loose assemblage?
 
 <p align="justify">
-The results from this work show that *G. atlanticus* and *P. physalis* have different probabilities of beaching in our very simple, simulated ocean. Whilst *G. atlanticus* always ended up on the beach, *P. physalis* often avoided beaching due to their intraspecific morphological variation. However, whilst this result provides support for the theory that *P. physalis* having two different sail orientations can help their populations survive a strong onshore wind, it fails to explain why we sometimes observe monospecific beaching events of bluebottles. The results suggests that *G. atlanticus* that come within 10 km of the shoreline, will inevitably beach. Such a conclusion seems unrealistic, however there may be some merit to it. *G. atlanticus* are primarily found far offshore in oceanic gyres systems, where they congregate under the influence of major currents. Perhaps then, when individuals do find themselves close to shore, their morphology simply makes them prone to beaching - assuming a dominant northeasterly wind and south-flowing current. If this were true, *P. physalis* beaching events that lack *G. atlanticus* could be explained by the drifting assemblage consisting solely of *P. physalis*. Alternatively, our model may have simply been to simple: with the wind direction being skewed too heavily towards a northeasterly origin, pushing individuals towards the beach at the western end of the grid. However, our model does provide a valuable exploration of the beaching dynamics of the two species and the fact that there are definite differences between them is an interesting find that could be further built upon.
+The results from this work show that *G. atlanticus* and *P. physalis* have different probabilities of beaching in our very simple, simulated ocean. Whilst *G. atlanticus* always ended up on the beach, *P. physalis* often avoided beaching due to their intraspecific morphological variation. However, whilst this result provides support for the theory that *P. physalis* having two different sail orientations can help their populations survive a strong onshore wind, it fails to explain why we sometimes observe monospecific beaching events of bluebottles. The results suggests that *G. atlanticus* that come within 10 km of the shoreline, will inevitably beach. Such a conclusion seems unrealistic, however there may be some merit to it. *G. atlanticus* are primarily found far offshore in oceanic gyres systems, where they congregate under the influence of major currents. Perhaps then, when individuals do find themselves close to shore, their morphology simply makes them prone to beaching - assuming a dominant northeasterly wind and south-flowing current. If this were true, *P. physalis* beaching events that lack *G. atlanticus* could be explained by the drifting assemblage consisting solely of *P. physalis*. Alternatively, our model may have been to simple: with the wind direction being skewed too heavily towards a northeasterly origin, pushing individuals towards the beach at the western end of the grid. However, our model does provide a valuable exploration of the beaching dynamics of the two species and the fact that there are definite differences between them is an interesting find that could be further built upon.
 </p>
 
 ## 5.2 Glaucus atlanticus as an active predator?
 
 <p align="justify">
-We also investigated the role of swimming speed and chemodetection on the ability of *G. atlanticus* to find prey. Unsurprisingly, the number of predator-prey interactions sharply increased with chemodetection range. The larger the radius of chemodetection, the more likely it is to sense prey. Once prey is sensed, *G. atlanticus* will move towards it, but once the prey item moves out of that zone, the predator is essentially aimless and no interaction is recorded. The lack of a relationship between swimming speed and the number of interactions should then be interpreted as an inability of the predator to 'keep up' with sensed prey. If a predator swims fast enough, it will remain within sensing range of the prey (or, if it is really fast, within feeding range). However, if the prey item is moving too fast due to the effects of physical forces, sensed prey will quickly move of the sensory zone, and the predator once again becomes aimless. Our results show that there is no difference in the number of interactions for swimming speeds of 0, or the complete inability to move towards a goal, and a speed of 20 meters an hour. It is thus likely that most interactions take place at the early stages of the simulation, when individuals are relatively close to one another. Following this early stage, individuals quickly diverge due to their different morphologies - it is at this stage that the predator would need to keep up with prey by swimming at a speed equal to the prey's physically-driven movement. Based on a complete lack of association between swimming speed and interactions, we are comfotable concluding that *G. atlanticus* does not actively hunt prey over larger distances, but probably encounters prey randomly. However, we stress that this conclusion relies heavily on the densities of prey and predators used in our simulations, which were between 250-1250 over the entire grid, in addition to the chosen wind and current regime. In the real world, *G. atlanticus* may produce up to 12,000 embryo's every 12 hours (Helm, 2021). Many neustonic species produce similar numbers of offspring: densities might then be extremely high in certain areas, allowing *G. atlanticus* to increase their interactions with prey by swimming very small distances, especially if those areas have wind and current regimes conducive to concentrating the neuston (i.e. the centers of oceanic gyres). 
+We also investigated the role of swimming speed and chemodetection on the ability of *G. atlanticus* to find prey. Unsurprisingly, the number of predator-prey interactions sharply increased with chemodetection range. The larger the radius of chemodetection, the more likely it is to sense prey. Once prey is sensed, *G. atlanticus* will move towards it, but once the prey item moves out of that zone, the predator is essentially aimless and no interaction is recorded. The lack of a relationship between swimming speed and the number of interactions should then be interpreted as an inability of the predator to 'keep up' with sensed prey. If a predator swims fast enough, it will remain within sensing range of the prey (or, if it is really fast, within feeding range). However, if the prey item is moving too fast due to the effects of physical forces, sensed prey will quickly move out of the sensory zone, and the predator once again becomes aimless. Our results show that there is no difference in the number of interactions for swimming speeds of 0 (the complete inability to move towards a goal), and a speed of 20 meters an hour. It is thus likely that most interactions take place at the early stages of the simulation, when individuals are relatively close to one another. Following this early stage, individuals quickly diverge due to their different morphologies - it is at this stage that the predator would need to keep up with prey by swimming at a speed equal to the prey's physically-driven movement. Based on a complete lack of association between swimming speed and interactions, we are comfotable concluding that *G. atlanticus* does not actively hunt prey over larger distances, but probably encounters prey randomly. However, we stress that this conclusion relies heavily on the densities of prey and predators used in our simulations, which were between 250-1250 over the entire grid, in addition to the chosen wind and current regime. In the real world, *G. atlanticus* may produce up to 12,000 embryo's every 12 hours (Helm, 2021). Many neustonic species produce similar numbers of offspring: densities might then be extremely high in certain areas, allowing *G. atlanticus* to increase their interactions with prey by swimming very small distances, especially if those areas have wind and current regimes conducive to concentrating the neuston (i.e. the centers of oceanic gyres). 
 </p>
 
 # 6. References
@@ -1130,8 +1147,8 @@ simBlueFleet.stochPhys <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
 # throughout the ocean, they should be relatively close
 # together to start. We can then see how they diverge.
 
-iniSpace <- list(xmin = 1.1,
-                 xmax = 1.11,
+iniSpace <- list(xmin = 5,
+                 xmax = 8,
                  ymin = 35,
                  ymax = 60)
 
@@ -1560,10 +1577,10 @@ LHS$density <- density
 # throughout the ocean, they should be relatively close
 # together to start. We can then see how they diverge.
 
-iniSpace <- list(xmin = 8,
-                 xmax = 9,
-                 ymin = 40,
-                 ymax = 41)
+iniSpace <- list(xmin = 5,
+                 xmax = 8,
+                 ymin = 35,
+                 ymax = 60)
 
 # Grid spatial extent, each unit represents a kilometer
 n_rows <- 100

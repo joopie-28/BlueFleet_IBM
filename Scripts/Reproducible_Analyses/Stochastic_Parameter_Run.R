@@ -341,11 +341,10 @@ simBlueFleet.stochPhys <- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus,
 # throughout the ocean, they should be relatively close
 # together to start. We can then see how they diverge.
 
-iniSpace <- list(xmin = 1.1,
-                 xmax = 1.11,
+iniSpace <- list(xmin = 5,
+                 xmax = 8,
                  ymin = 35,
                  ymax = 60)
-
 # Grid spatial extent, each unit represents a kilometer
 n_rows <- 100
 n_cols <- 100
