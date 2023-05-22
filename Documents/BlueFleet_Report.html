@@ -11,7 +11,7 @@
 
 <meta name="author" content="J.M. Sassen" />
 
-<meta name="date" content="2023-05-21" />
+<meta name="date" content="2023-05-22" />
 
 <title>Predator, prey and strandings: An IBM approach to modelling the ‘Blue Fleet’</title>
 
@@ -353,7 +353,7 @@ display: none;
 <h1 class="title toc-ignore">Predator, prey and strandings: An IBM
 approach to modelling the ‘Blue Fleet’</h1>
 <h4 class="author">J.M. Sassen</h4>
-<h4 class="date">2023-05-21</h4>
+<h4 class="date">2023-05-22</h4>
 
 </div>
 
@@ -1047,10 +1047,10 @@ if (length(args) &lt; 1) { # no arguments provided
 # throughout the ocean, they should be relatively close
 # together to start. We can then see how they diverge.
 
-iniSpace &lt;- list(xmin = 5,
+iniSpace &lt;- list(xmin = 7,
                  xmax = 8,
-                 ymin = 35,
-                 ymax = 60)
+                 ymin = 45,
+                 ymax = 50)
 
 # Grid spatial extent, each unit represents a kilometer
 n_rows &lt;- 100
@@ -1153,10 +1153,10 @@ LHS$density &lt;- density
 # throughout the ocean, they should be relatively close
 # together to start. We can then see how they diverge.
 
-iniSpace &lt;- list(xmin = 5,
+iniSpace &lt;- list(xmin = 7,
                  xmax = 8,
-                 ymin = 40,
-                 ymax = 41)
+                 ymin = 45,
+                 ymax = 50)
 
 # Grid spatial extent, each unit represents a kilometer
 n_rows &lt;- 100
@@ -1320,10 +1320,10 @@ should then be interpreted as an inability of the predator to ‘keep up’
 with sensed prey. If a predator swims fast enough, it will remain within
 sensing range of the prey (or, if it is really fast, within feeding
 range). However, if the prey item is moving too fast due to the effects
-of physical forces, sensed prey will quickly move of the sensory zone,
-and the predator once again becomes aimless. Our results show that there
-is no difference in the number of interactions for swimming speeds of 0,
-or the complete inability to move towards a goal, and a speed of 20
+of physical forces, sensed prey will quickly move out of the sensory
+zone, and the predator once again becomes aimless. Our results show that
+there is no difference in the number of interactions for swimming speeds
+of 0 (the complete inability to move towards a goal), and a speed of 20
 meters an hour. It is thus likely that most interactions take place at
 the early stages of the simulation, when individuals are relatively
 close to one another. Following this early stage, individuals quickly
@@ -1720,10 +1720,10 @@ simBlueFleet.stochPhys &lt;- function(nTimes,n_rows, n_cols, nPhysalia, nGlaucus
 # throughout the ocean, they should be relatively close
 # together to start. We can then see how they diverge.
 
-iniSpace &lt;- list(xmin = 5,
+iniSpace &lt;- list(xmin = 7,
                  xmax = 8,
-                 ymin = 35,
-                 ymax = 60)
+                 ymin = 45,
+                 ymax = 50)
 
 # Grid spatial extent, each unit represents a kilometer
 n_rows &lt;- 100
@@ -2145,10 +2145,10 @@ LHS$density &lt;- density
 # throughout the ocean, they should be relatively close
 # together to start. We can then see how they diverge.
 
-iniSpace &lt;- list(xmin = 5,
+iniSpace &lt;- list(xmin = 7,
                  xmax = 8,
-                 ymin = 35,
-                 ymax = 60)
+                 ymin = 45,
+                 ymax = 50)
 
 # Grid spatial extent, each unit represents a kilometer
 n_rows &lt;- 100

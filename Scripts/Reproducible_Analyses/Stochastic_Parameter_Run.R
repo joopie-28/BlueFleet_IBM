@@ -350,7 +350,7 @@ n_rows <- 100
 n_cols <- 100
 
 # Number of simulation iterations
-nTimes = 5
+nTimes = 500
 
 # Number of Glaucus and Pysalia individuals
 nPhysalia = 600
